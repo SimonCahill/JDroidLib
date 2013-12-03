@@ -6,78 +6,61 @@
 
 package JDroidLib.installers;
 
-import java.net.*;
 import java.io.*;
+import java.net.*;
 import JDroidLib.exceptions.*;
 
 /**
  *
  * @author Simon
  */
-public class AdbInstaller {
+public class FastbootInstaller {
     
     //<editor-fold defaultstate="collapsed" desc="Variables">
     // Get OS name
     String osName = System.getProperty("os.name");
     // Get user directory and add JDroidLib dir
     String m4gkbeatzDir = System.getProperty("user.home") + "/.m4gkbeatz/JDroidLib/bin/";
-    // Windows ADB filenames
-    File adbWin = new File(m4gkbeatzDir + "adb.exe");
-    File adbWinApi = new File(m4gkbeatzDir + "AdbWinApi.dll");
-    File adbWinUsbApi = new File(m4gkbeatzDir + "AdbWinUsbApi.dll");
-    // Linux ADB file name
-    File adbLinux = new File(m4gkbeatzDir + "adb");
-    // Mac OS ADB file name
-    File adbMac = new File(m4gkbeatzDir + "adb");
+    // Windows fastboot filename
+    File fastbootWin = new File(m4gkbeatzDir + "fastboot.exe");
+    // Mac OS fastboot filename
+    File fastbootMac = new File(m4gkbeatzDir + "fastboot");
+    // Linux fastboot filename
+    File fastbootLinux = new File(m4gkbeatzDir + "fastboot");
     
-    // Windows ADB URLs
-    String _adbWin = "http://team-m4gkbeatz.eu/Beatsleigher/adb_win/adb.exe";
-    String _adbWinApi = "http://team-m4gkbeatz.eu/Beatsleigher/adb_win/AdbWinApi.dll";
-    String _adbWinUsbApi = "http://team-m4gkbeatz.eu/Beatsleigher/adb_win/AdbWinUsbApi.dll";
-    // Linux ADB URL
-    String _adbLinux = "http://team-m4gkbeatz.eu/Beatsleigher/adb_linux/adb";
-    // Mac OS ADB URL
-    String _adbMac = "http://team-m4gkbeatz.eu/Beatsleigher/adb_mac/adb";
+    // Windows fastboot URL
+    String _fastbootWin = "http://team-m4gkbeatz.eu/beatsleigher/fastboot_win/fastboot.exe";
+    // Mac OS fastboot URL
+    String _fastbootMac = "http://team-m4gkbeatz.eu/Beatsleigher/fastboot_mac/fastboot";
+    // Linux fastboot URL
+    String _fastbootLinux = "http://team-m4gkbeatz.eu/Beatsleigher/fastboot_linux/fastboot";
     //</editor-fold>
     
-    public AdbInstaller() {  }
+    public FastbootInstaller() { }
     
-    /**
-     * Installs ADB binaries to location on the hard drive for use only with JDroidLib.
-     * Can be used with other programs.
-     * @throws InvalidOSException
-     * @throws MalformedURLException
-     * @throws IOException
-     */
-    public void installAdb() throws InvalidOSException, MalformedURLException, IOException {
+    public void installFastboot() throws InvalidOSException, MalformedURLException, IOException {
         if (osName.contains("Windows")) {
             // Create necessary dirs
-            if (!adbWin.exists()) adbWin.getParentFile().mkdirs();
+            if (!fastbootWin.exists()) fastbootWin.getParentFile().mkdirs();
             // Download files for Windows
             // adb.exe
-            int dl = download(_adbWin, adbWin.toString());
+            int dl = download(_fastbootWin, fastbootWin.toString());
             while (dl != 1) {
                 // Wait for download to complete
             }
-            // AdbWinApi.dll
-            dl = download(_adbWinApi, adbWinApi.toString());
-            while (dl != 1) { /*Wait for download to complete*/}
-            // AdbWinUsbApi.dll
-            dl = download(_adbWinUsbApi, adbWinUsbApi.toString());
-            while (dl != 1) { /*Wait for download to complete*/ }
             return;
         } else if (osName.contains("Mac")) {
             // Create necessary dirs
-            if (!adbMac.exists()) adbMac.getParentFile().mkdirs();
+            if (!fastbootMac.exists()) fastbootMac.getParentFile().mkdirs();
             // Download files for Mac
-            int dl = download(_adbMac, adbMac.toString());
+            int dl = download(_fastbootMac, fastbootMac.toString());
             while (dl != 1) { /*Wait for download to complete*/ }
             return;
         } else if (osName.contains("Ubuntu") | osName.contains("Debian") | osName.contains("Red Hat") | osName.contains("Fedora") | osName.contains("Damn Small")) /*Feel free to add more OSs*/ {
             // Create necessary dirs
-            if (!adbLinux.exists()) adbLinux.getParentFile().mkdirs();
+            if (!fastbootLinux.exists()) fastbootLinux.getParentFile().mkdirs();
             // Download files for Linux
-            int dl = download(_adbLinux, adbLinux.toString());
+            int dl = download(_fastbootLinux, fastbootLinux.toString());
             while (dl != 1) { /*Wait for download to complete*/ }
             return;
         } else throw new InvalidOSException("WARNING: OS could not be determined or is not supported for ADB installation!");
