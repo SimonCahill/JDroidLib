@@ -18,26 +18,29 @@ public class AdbInstaller {
     
     //<editor-fold defaultstate="collapsed" desc="Variables">
     // Get OS name
-    String osName = System.getProperty("os.name");
+    static String osName = System.getProperty("os.name");
     // Get user directory and add JDroidLib dir
-    String m4gkbeatzDir = System.getProperty("user.home") + "/.m4gkbeatz/JDroidLib/bin/";
+    static String m4gkbeatzDir = System.getProperty("user.home") + "/.m4gkbeatz/JDroidLib/bin/";
     // Windows ADB filenames
-    File adbWin = new File(m4gkbeatzDir + "adb.exe");
-    File adbWinApi = new File(m4gkbeatzDir + "AdbWinApi.dll");
-    File adbWinUsbApi = new File(m4gkbeatzDir + "AdbWinUsbApi.dll");
+    static File adbWin = new File(m4gkbeatzDir + "adb.exe");
+    static File adbWinApi = new File(m4gkbeatzDir + "AdbWinApi.dll");
+    static File adbWinUsbApi = new File(m4gkbeatzDir + "AdbWinUsbApi.dll");
     // Linux ADB file name
-    File adbLinux = new File(m4gkbeatzDir + "adb");
+    static File adbLinux = new File(m4gkbeatzDir + "adb");
     // Mac OS ADB file name
-    File adbMac = new File(m4gkbeatzDir + "adb");
+    static File adbMac = new File(m4gkbeatzDir + "adb");
     
     // Windows ADB URLs
-    String _adbWin = "http://team-m4gkbeatz.eu/Beatsleigher/adb_win/adb.exe";
-    String _adbWinApi = "http://team-m4gkbeatz.eu/Beatsleigher/adb_win/AdbWinApi.dll";
-    String _adbWinUsbApi = "http://team-m4gkbeatz.eu/Beatsleigher/adb_win/AdbWinUsbApi.dll";
+    static String _adbWin = "http://team-m4gkbeatz.eu/Beatsleigher/adb_win/adb.exe";
+    static String _adbWinApi = "http://team-m4gkbeatz.eu/Beatsleigher/adb_win/AdbWinApi.dll";
+    static String _adbWinUsbApi = "http://team-m4gkbeatz.eu/Beatsleigher/adb_win/AdbWinUsbApi.dll";
     // Linux ADB URL
-    String _adbLinux = "http://team-m4gkbeatz.eu/Beatsleigher/adb_linux/adb";
+    static String _adbLinux = "http://team-m4gkbeatz.eu/Beatsleigher/adb_linux/adb";
     // Mac OS ADB URL
-    String _adbMac = "http://team-m4gkbeatz.eu/Beatsleigher/adb_mac/adb";
+    static String _adbMac = "http://team-m4gkbeatz.eu/Beatsleigher/adb_mac/adb";
+    
+    // Settings file
+    
     //</editor-fold>
     
     public AdbInstaller() {  }
@@ -49,7 +52,7 @@ public class AdbInstaller {
      * @throws MalformedURLException
      * @throws IOException
      */
-    public void installAdb() throws InvalidOSException, MalformedURLException, IOException {
+    public static void installAdb() throws InvalidOSException, MalformedURLException, IOException {
         if (osName.contains("Windows")) {
             // Create necessary dirs
             if (!adbWin.exists()) adbWin.getParentFile().mkdirs();
@@ -91,7 +94,7 @@ public class AdbInstaller {
      * @throws MalformedURLException
      * @throws IOException 
      */
-    public int download(String url, String filename) throws MalformedURLException, IOException{
+    private static int download(String url, String filename) throws MalformedURLException, IOException{
         BufferedInputStream in = null;
         FileOutputStream fout = null;
         try
