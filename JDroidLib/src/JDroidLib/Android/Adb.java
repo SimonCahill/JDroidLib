@@ -33,6 +33,10 @@ public final class Adb {
 
     Command cmd = new Command();
 
+    /**
+     * 
+     * @return 
+     */
     private String getAdb() {
         String osName = System.getProperty("os.name");
         String bin = System.getProperty("user.home") + "/.m4gkbeatz/JDroidLib/bin/";
@@ -49,6 +53,9 @@ public final class Adb {
         return _adb;
     }
 
+    /**
+     * 
+     */
     public void startServer() {
         try {
             cmd.executeProcessNoReturn(getAdb(), "start-server");
@@ -56,7 +63,10 @@ public final class Adb {
             Logger.getLogger(Adb.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-
+    
+    /**
+     * 
+     */
     public void killServer() {
         try {
             cmd.executeProcessNoReturn(getAdb(), "kill-server");
@@ -65,6 +75,9 @@ public final class Adb {
         }
     }
 
+    /**
+     * 
+     */
     public void restartServer() {
         try {
             cmd.executeProcessNoReturn(getAdb(), "kill-server");
@@ -75,6 +88,14 @@ public final class Adb {
         }
     }
 
+    /**
+     * 
+     * @param command
+     * @param useShell
+     * @param rootShell
+     * @throws InvalidCommandException
+     * @throws IOException 
+     */
     public void executeAdbCommand(String command, boolean useShell, boolean rootShell) throws InvalidCommandException, IOException {
         if (!command.equals("")) {
             String adbCmd = "";
@@ -98,6 +119,15 @@ public final class Adb {
         } else throw new InvalidCommandException("You have entered an empty command. Please type a valid command!");
     }
     
+    /**
+     * 
+     * @param command
+     * @param useShell
+     * @param rootShell
+     * @return
+     * @throws InvalidCommandException
+     * @throws IOException 
+     */
     public String executeAdbCommandReturnLastLine(String command, boolean useShell, boolean rootShell) throws InvalidCommandException, IOException {
         String adbCmd = "";
         if (!command.equals("")) {
