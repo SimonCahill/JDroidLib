@@ -19,10 +19,32 @@
 
 package JDroidLib.Android;
 
+import JDroidLib.Android.*;
+
 /**
  *
  * @author Simon
  */
-public class Adb {
+public final class Adb {
+    private static Object lock = "Locked";
+    private final String adb = "adb";
+    private final String adb_exe() {
+        String osName = System.getProperty("os.name");
+        String mbDir = System.getProperty("user.home") + "/.m4gkbeatz/JDroidLib/bin/";
+        if (osName.contains("Windows")) {
+            return mbDir + "adb.exe";
+        } else {
+            return mbDir + "adb";
+        }
+    }
     
+    public static AdbCmd formAdbCmd(String cmd, Object[] args) {
+        String adbCommand = (args.length > 0) ? cmd + " " : cmd;
+        
+        for (int i = 0; i < args.length; i++) {
+            adbCommand += args[i] + " ";
+        }
+        
+        return new AdbCmd(adbCommand);
+    }
 }

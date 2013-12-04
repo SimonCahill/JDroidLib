@@ -23,8 +23,6 @@ package JDroidLib.Android;
  *
  * @author Simon
  */
-public class AdbCmd {
-    private String cmd;
-    String command() { return cmd; }
-    AdbCmd(String command) { this.cmd = command; }
+public class BusyBox {
+    
 }
