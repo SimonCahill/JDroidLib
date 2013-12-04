@@ -23,6 +23,7 @@ import JDroidLib.utils.*;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.lang.*;
 
 /**
  *
@@ -58,4 +59,13 @@ public final class Adb {
         }
     }
     
+    public void restartServer() {
+        try {
+            cmd.executeProcessNoReturn(getAdb(), "kill-server");
+            Thread.sleep(2000);
+            cmd.executeProcessNoReturn(getAdb(), "start-server");
+        } catch (IOException | InterruptedException ex) {
+            Logger.getLogger(Adb.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
 }
