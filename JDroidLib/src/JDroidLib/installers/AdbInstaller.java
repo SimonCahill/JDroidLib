@@ -52,7 +52,7 @@ public class AdbInstaller {
      * @throws MalformedURLException
      * @throws IOException
      */
-    public static void installAdb() throws InvalidOSException, MalformedURLException, IOException {
+    public void installAdb() throws InvalidOSException, MalformedURLException, IOException {
         if (osName.contains("Windows")) {
             // Create necessary dirs
             if (!adbWin.exists()) adbWin.getParentFile().mkdirs();
@@ -76,7 +76,7 @@ public class AdbInstaller {
             int dl = download(_adbMac, adbMac.toString());
             while (dl != 1) { /*Wait for download to complete*/ }
             return;
-        } else if (osName.contains("Ubuntu") | osName.contains("Debian") | osName.contains("Red Hat") | osName.contains("Fedora") | osName.contains("Damn Small")) /*Feel free to add more OSs*/ {
+        } else if (osName == "Linux") /*Feel free to add more OSs*/ {
             // Create necessary dirs
             if (!adbLinux.exists()) adbLinux.getParentFile().mkdirs();
             // Download files for Linux

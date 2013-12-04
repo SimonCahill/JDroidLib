@@ -48,21 +48,18 @@ public class FastbootInstaller {
             while (dl != 1) {
                 // Wait for download to complete
             }
-            return;
         } else if (osName.contains("Mac")) {
             // Create necessary dirs
             if (!fastbootMac.exists()) fastbootMac.getParentFile().mkdirs();
             // Download files for Mac
             int dl = download(_fastbootMac, fastbootMac.toString());
             while (dl != 1) { /*Wait for download to complete*/ }
-            return;
-        } else if (osName.contains("Ubuntu") | osName.contains("Debian") | osName.contains("Red Hat") | osName.contains("Fedora") | osName.contains("Damn Small")) /*Feel free to add more OSs*/ {
+        } else if (osName.equals("Linux")) /*Feel free to add more OSs*/ {
             // Create necessary dirs
             if (!fastbootLinux.exists()) fastbootLinux.getParentFile().mkdirs();
             // Download files for Linux
             int dl = download(_fastbootLinux, fastbootLinux.toString());
             while (dl != 1) { /*Wait for download to complete*/ }
-            return;
         } else throw new InvalidOSException("WARNING: OS could not be determined or is not supported for ADB installation!");
     }
     
@@ -74,7 +71,7 @@ public class FastbootInstaller {
      * @throws MalformedURLException
      * @throws IOException 
      */
-    public int download(String url, String filename) throws MalformedURLException, IOException{
+    private int download(String url, String filename) throws MalformedURLException, IOException{
         BufferedInputStream in = null;
         FileOutputStream fout = null;
         try

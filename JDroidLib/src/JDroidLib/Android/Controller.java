@@ -19,10 +19,53 @@
 
 package JDroidLib.Android;
 
+import java.util.*;
+import JDroidLib.installers.*;
+import JDroidLib.exceptions.*;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+
 /**
  *
  * @author Simon
  */
-public class Controller {
+public final class Controller {
+    Adb adb = new Adb();
+    AdbInstaller installerAdb = new AdbInstaller();
+    FastbootInstaller installerFastboot = new FastbootInstaller();
     
+    private Controller instance;
+    private List<String> connectedDevices;
+    
+    public Controller getInstance() {
+        if (instance == null) {
+            instance = new Controller();
+            try {
+                instance.install();
+            } catch (    InvalidOSException | IOException ex) {
+                Logger.getLogger(Controller.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            adb.startServer();
+        }
+        return instance;
+    }
+    
+    private void install() throws InvalidOSException, MalformedURLException, IOException {
+     installerAdb.installAdb();
+     installerFastboot.installFastboot();
+    }
+    
+    public List<String> getConnectedDevices() {
+        updateDeviceList();
+        return connectedDevices;
+    }
+    
+    public void updateDeviceList() {
+        String deviceList = "";
+        
+        connectedDevices.clear();
+    }
 }
