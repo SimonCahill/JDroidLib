@@ -37,14 +37,14 @@ public final class Adb {
         String bin = System.getProperty("user.home") + "/.m4gkbeatz/JDroidLib/bin/";
         String _adb = "";
         if (osName.contains("Windows")) _adb = bin + "adb.exe";
-        if (osName.contains("Linux")) _adb = bin + "adb";
-        
+        if (osName.equals("Linux")) _adb = bin + "adb";
+        if (osName.contains("Mac")) _adb = bin + "adb";
         return _adb;
     }
     
     public void startServer() {
         try {
-            cmd.executeProcessNoReturn(null, null);
+            cmd.executeProcessNoReturn(getAdb(), "start-server");
         } catch (IOException ex) {
             Logger.getLogger(Adb.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -52,7 +52,7 @@ public final class Adb {
     
     public void killServer() {
         try {
-            cmd.executeProcessNoReturn(null, null);
+            cmd.executeProcessNoReturn(getAdb(), "kill-server");
         } catch (IOException ex) {
             Logger.getLogger(Adb.class.getName()).log(Level.SEVERE, null, ex);
         }
