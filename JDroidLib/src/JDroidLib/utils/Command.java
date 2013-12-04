@@ -21,6 +21,7 @@ package JDroidLib.utils;
 
 import java.io.*;
 import java.util.*;
+import java.util.logging.Logger;
 
 /**
  *
@@ -32,6 +33,7 @@ public final class Command {
     ProcessBuilder process = null;
     Process pr = null;
     Date timeNow = new Date();
+    String osName = System.getProperty("os.name");
     
     public void executeProcessNoReturn(String _process, String arg) throws IOException {
         process = new ProcessBuilder(_process, arg);
@@ -59,6 +61,31 @@ public final class Command {
             output.append(line);
         }
         return output;
+    }
+    
+    public boolean isProcessRunning(String processName) throws IOException {
+        boolean value = false;
+        if (osName.equals("Linux") | osName.contains("Mac")) {
+            process = new ProcessBuilder("ps", "-e");
+            pr = process.start();
+            String line;
+            prReader = new BufferedReader(new InputStreamReader(pr.getInputStream()));
+            while ((line = prReader.readLine()) != null) {
+                if (line.contains(processName)) { value = true; break; }
+            }
+        } else {
+            String winDir = System.getenv("windir") + "/System32/tasklist.exe";
+            process = new ProcessBuilder(winDir);
+            pr = process.start();
+            String line;
+            prReader = new BufferedReader(new InputStreamReader(pr.getInputStream()));
+            while ((line = prReader.readLine()) != null) {
+                if (line.contains(processName)) { value = true; break; }
+            }
+        }
+        
+        return value;
+        
     }
     
     
