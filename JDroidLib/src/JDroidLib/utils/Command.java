@@ -17,14 +17,12 @@
  * MA 02110-1301  USA
  */
 
-package JDroidLib.Android;
+package JDroidLib.utils;
 
 /**
  *
  * @author Simon
  */
-public class AdbCmd {
-    private String cmd;
-    String command() { return cmd; }
-    AdbCmd(String command) { this.cmd = command; }
+public class Command {
+    
 }
