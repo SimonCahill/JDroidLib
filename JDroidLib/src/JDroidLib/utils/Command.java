@@ -19,10 +19,47 @@
 
 package JDroidLib.utils;
 
+import java.io.*;
+import java.util.*;
+
 /**
  *
  * @author Simon
  */
-public class Command {
+public final class Command {
+    
+    BufferedReader prReader = null;
+    ProcessBuilder process = null;
+    Process pr = null;
+    Date timeNow = new Date();
+    
+    public void executeProcessNoReturn(String _process, String arg) throws IOException {
+        process = new ProcessBuilder(_process, arg);
+        pr = process.start();
+    }
+    
+    public String executeProcessReturnLastLine(String _process, String arg) throws IOException {
+        process = new ProcessBuilder(_process, arg);
+        pr = process.start();
+        prReader = new BufferedReader(new InputStreamReader(pr.getInputStream()));
+        String line;
+        while ((line = prReader.readLine()) != null) {
+            // Wait for input to end.
+        }
+        return line;
+    }
+    
+    public StringBuilder executeProcessReturnAllOutput(String _process, String arg) throws IOException {
+        process = new ProcessBuilder(_process, arg);
+        pr = process.start();
+        prReader = new BufferedReader(new InputStreamReader(pr.getInputStream()));
+        StringBuilder output = null;
+        String line;
+        while ((line = prReader.readLine()) != null) {
+            output.append(line);
+        }
+        return output;
+    }
+    
     
 }
