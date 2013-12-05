@@ -132,4 +132,5 @@ public final class Fastboot {
         // Execute process and return value.
         return cmd.executeProcessReturnError(getFastboot(), _imgType + " " + imgLocation);
     }
+    
 }
