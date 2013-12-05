@@ -34,7 +34,7 @@ public final class Adb {
     Command cmd = new Command();
 
     /**
-     * 
+     * Returns the ADB executable path.
      * @return 
      */
     private String getAdb() {
@@ -54,7 +54,8 @@ public final class Adb {
     }
 
     /**
-     * 
+     *  Starts the ADB server.
+     * Should be used in separate thread!
      */
     public void startServer() {
         try {
@@ -65,7 +66,8 @@ public final class Adb {
     }
     
     /**
-     * 
+     * Kills ADB server.
+     * Should be used in seperate thread!
      */
     public void killServer() {
         try {
@@ -76,7 +78,8 @@ public final class Adb {
     }
 
     /**
-     * 
+     * Restarts ADB server. 
+     * Should be used in separate thread! Especially if used with JFrames
      */
     public void restartServer() {
         try {
@@ -89,7 +92,7 @@ public final class Adb {
     }
 
     /**
-     * 
+     * Executes ADB command (with/without shell and with/without rooting shell) without returning output.
      * @param command
      * @param useShell
      * @param rootShell
@@ -120,7 +123,7 @@ public final class Adb {
     }
     
     /**
-     * 
+     * Executes ADB command (with/without shell and with/without rooting shell) and returns output's last line
      * @param command
      * @param useShell
      * @param rootShell
@@ -152,7 +155,7 @@ public final class Adb {
     }
     
     /**
-     * 
+     * Executes ADB command (with/without shell and with/without rooting shell) and returns entire output
      * @param command
      * @param useShell
      * @param rootShell
