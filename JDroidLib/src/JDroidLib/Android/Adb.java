@@ -150,4 +150,38 @@ public final class Adb {
             }
         } else throw new InvalidCommandException("You have entered an invalid command. Please type a valid command!"); return "";
     }
+    
+    /**
+     * 
+     * @param command
+     * @param useShell
+     * @param rootShell
+     * @return
+     * @throws InvalidCommandException
+     * @throws IOException 
+     */
+    public StringBuilder executeAdbCommandReturnAll(String command, boolean useShell, boolean rootShell) throws InvalidCommandException, IOException {
+        String adbCmd= "";
+        StringBuilder out = null;
+        if (!command.equals("")) {
+            // Don't use shell at all
+            if (!useShell) {
+                adbCmd = command;
+                out = cmd.executeProcessReturnAllOutput(getAdb(), adbCmd);
+            }
+            // Use shell no root
+            if (useShell && !rootShell) {
+                adbCmd = "shell " + command;
+                out = cmd.executeProcessReturnAllOutput(getAdb(), adbCmd);
+            }
+            // Use shell with root
+            if (useShell && rootShell) {
+                adbCmd = String.format("-s {0} \"");
+                adbCmd += "su -c\"";
+                adbCmd += command;
+                out = cmd.executeProcessReturnAllOutput(getAdb(), adbCmd);
+            }
+            return out;
+        } else throw new InvalidCommandException("You have entered an empty command. Please enter a valid command!");
+    }
 }
