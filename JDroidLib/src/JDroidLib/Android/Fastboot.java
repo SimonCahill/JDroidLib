@@ -22,6 +22,7 @@ package JDroidLib.Android;
 import JDroidLib.utils.*;
 import java.io.*;
 import JDroidLib.exceptions.*;
+import JDroidLib.enums.*;
 
 /**
  *
@@ -42,21 +43,93 @@ public final class Fastboot {
     }
     private final Command cmd = new Command();
     
+    /**
+     * Executes fastboot command without returning executable's output.
+     * @param command
+     * @throws InvalidCommandException
+     * @throws IOException 
+     */
     public void executeFastbootCommandNoReturn(String command) throws InvalidCommandException, IOException{
         if (!command.equals("")) {
         cmd.executeProcessNoReturn(getFastboot(), command);
         } else throw new InvalidCommandException("You have entered an invalid command! Please enter a valid command.");
     }
     
+    /**
+     * Executes fastboot command, returns last output line
+     * @param command
+     * @return
+     * @throws InvalidCommandException
+     * @throws IOException 
+     */
     public String executeFastbootCommandReturnLastLine(String command) throws InvalidCommandException, IOException {
         if (!command.equals("")) {
             return cmd.executeProcessReturnLastLine(getFastboot(), command);
         } else throw new InvalidCommandException("You have entered an empty command! Please enter a valid command.");
     }
     
+    /**
+     * Executes fastboot command, returns executable's entire output as StringBuilder
+     * @param command
+     * @return
+     * @throws InvalidCommandException
+     * @throws IOException 
+     */
     public StringBuilder executeFastbootCommandReturnEntireOutput(String command) throws InvalidCommandException, IOException {
         if (!command.equals("")) {
             return cmd.executeProcessReturnAllOutput(getFastboot(), command);
         } else throw new InvalidCommandException("You have entered an empty command! Please enter a valid command.");
+    }
+    
+    /**
+     * Unlocks fastboot bootloaders using the oem unlock command.
+     * @throws java.io.IOException
+     */
+    public void oemUnlockBootloader() throws IOException {
+        cmd.executeProcessNoReturn(getFastboot(), "oem unlock");
+    }
+    
+    /**
+     * Locks fastboot bootloader using the oem lock command
+     * @throws IOException 
+     */
+    public void oemLockBootloader() throws IOException {
+        cmd.executeProcessNoReturn(getFastboot(), "oem lock");
+    }
+    
+    /**
+     * Reboots device from fastboot to Android OS
+     * @throws IOException 
+     */
+    public void rebootToAndroid() throws IOException {
+        cmd.executeProcessNoReturn(getFastboot(), "reboot");
+    }
+    
+    /**
+     * Reboot the device's bootloader.
+     * @throws IOException 
+     */
+    public void rebootBootloader() throws IOException {
+        cmd.executeProcessNoReturn(getFastboot(), "reboot-bootloader");
+    }
+    
+    /**
+     * Attempts to flash Linux system image via fastboot. 
+     * Returns executable's error.
+     * If returned value = "", then no error occurred while flashing image.
+     * 
+     * @param imgType
+     * @param imgLocation
+     * @return
+     * @throws IOException
+     * @throws InvalidImageException 
+     */
+    public String flashImg(FastbootImgType imgType, String imgLocation) throws IOException, InvalidImageException {
+        // Get image type
+        String _imgType = imgType.toString().toLowerCase();
+        // Detect img
+        if (!imgLocation.contains(_imgType) && !imgLocation.endsWith(".img")) throw new InvalidImageException();
+        // Execute process and return value.
+        return cmd.executeProcessReturnError(getFastboot(), _imgType + " " + imgLocation);
     }
 }

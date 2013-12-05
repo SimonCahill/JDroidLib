@@ -88,5 +88,16 @@ public final class Command {
         
     }
     
-    
+    public String executeProcessReturnError(String processName, String arg) throws IOException {
+        process = new ProcessBuilder(processName, arg);
+        process.redirectError();
+        pr = process.start();
+        prReader = new BufferedReader(new InputStreamReader(pr.getErrorStream()));
+        String line;
+        String output = "";
+        while ((line = prReader.readLine()) != null) {
+            output += line + "\n";
+        }
+        return output;
+    }
 }
