@@ -20,10 +20,11 @@ package JDroidLib.Android;
 
 import JDroidLib.utils.*;
 import JDroidLib.exceptions.*;
-import java.io.IOException;
+import java.io.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.lang.*;
+import JDroidLib.installers.*;
 
 /**
  *
@@ -49,6 +50,15 @@ public final class Adb {
         }
         if (osName.contains("Mac")) {
             _adb = bin + "adb";
+        }
+        File adb = new File(_adb);
+        if (!adb.exists()) {
+            AdbInstaller adbInst = new AdbInstaller();
+            try {
+                adbInst.installAdb();
+            } catch (    InvalidOSException | IOException ex) {
+                Logger.getLogger(Adb.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
         return _adb;
     }

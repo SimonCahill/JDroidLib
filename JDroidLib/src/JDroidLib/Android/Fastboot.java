@@ -23,6 +23,9 @@ import JDroidLib.utils.*;
 import java.io.*;
 import JDroidLib.exceptions.*;
 import JDroidLib.enums.*;
+import JDroidLib.installers.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -38,6 +41,15 @@ public final class Fastboot {
             str = mbDir + "fastboot.exe";
         } else {
             str = mbDir + "fastboot";
+        }
+        File fastboot = new File(str);
+        if (!fastboot.exists()) {
+            FastbootInstaller fbInst = new FastbootInstaller();
+            try {
+                fbInst.installFastboot();
+            } catch (    InvalidOSException | IOException ex) {
+                Logger.getLogger(Fastboot.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
         return str;
     }
