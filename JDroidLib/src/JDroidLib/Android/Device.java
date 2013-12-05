@@ -36,4 +36,6 @@ public class Device {
     Device (String serial) {
         serialNumber = serial;
     }
+    
+    
 }

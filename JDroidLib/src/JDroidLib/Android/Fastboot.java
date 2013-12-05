@@ -19,10 +19,44 @@
 
 package JDroidLib.Android;
 
+import JDroidLib.utils.*;
+import java.io.*;
+import JDroidLib.exceptions.*;
+
 /**
  *
  * @author Simon
  */
-public class Fastboot {
+public final class Fastboot {
     
+    private final String mbDir = System.getProperty("user.home") + "/.m4gkbeatz/JDroidLib/bin/";
+    private final String osName = System.getProperty("os.name");
+    private String getFastboot() {
+        String str = "";
+        if (osName.contains("Windows")) {
+            str = mbDir + "fastboot.exe";
+        } else {
+            str = mbDir + "fastboot";
+        }
+        return str;
+    }
+    private final Command cmd = new Command();
+    
+    public void executeFastbootCommandNoReturn(String command) throws InvalidCommandException, IOException{
+        if (!command.equals("")) {
+        cmd.executeProcessNoReturn(getFastboot(), command);
+        } else throw new InvalidCommandException("You have entered an invalid command! Please enter a valid command.");
+    }
+    
+    public String executeFastbootCommandReturnLastLine(String command) throws InvalidCommandException, IOException {
+        if (!command.equals("")) {
+            return cmd.executeProcessReturnLastLine(getFastboot(), command);
+        } else throw new InvalidCommandException("You have entered an empty command! Please enter a valid command.");
+    }
+    
+    public StringBuilder executeFastbootCommandReturnEntireOutput(String command) throws InvalidCommandException, IOException {
+        if (!command.equals("")) {
+            return cmd.executeProcessReturnAllOutput(getFastboot(), command);
+        } else throw new InvalidCommandException("You have entered an empty command! Please enter a valid command.");
+    }
 }
