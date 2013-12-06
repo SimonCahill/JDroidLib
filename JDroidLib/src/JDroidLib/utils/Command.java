@@ -22,12 +22,13 @@ package JDroidLib.utils;
 import java.io.*;
 import java.util.*;
 import java.util.logging.Logger;
+import javax.swing.*;
 
 /**
  *
  * @author Simon
  */
-public final class Command {
+public abstract class Command extends SwingWorker {
     
     BufferedReader prReader = null;
     ProcessBuilder process = null;
