@@ -21,6 +21,11 @@ public class JDroidLib_TestApp {
      */
     public static void main(String[] args) {
         ui.setVisible(true);
+        while (ui.isVisible()) {
+           System.out.println("JDroidLib Test UI is visible");
+        }
+        System.out.println("JDroidLib test UI is no longer visible. Exiting...");
+        System.exit(0);
     }
     
 }

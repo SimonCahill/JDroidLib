@@ -32,7 +32,7 @@ import JDroidLib.installers.*;
  */
 public final class Adb {
 
-    Command cmd;
+    Command cmd = new Command();
 
     /**
      * Returns the ADB executable path.

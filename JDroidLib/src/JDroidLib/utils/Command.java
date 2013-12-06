@@ -27,7 +27,7 @@ import javax.swing.*;
  *
  * @author Simon
  */
-public abstract class Command extends SwingWorker {
+public class Command {
     
     BufferedReader prReader = null;
     ProcessBuilder process = null;

@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
+import javax.swing.*;
 
 /**
  *
@@ -62,6 +63,7 @@ public class TestUI extends javax.swing.JFrame {
         jButton7 = new javax.swing.JButton();
         jButton8 = new javax.swing.JButton();
 
+        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("JDroidLib Test UI");
         setResizable(false);
         setType(java.awt.Window.Type.UTILITY);
@@ -144,12 +146,19 @@ public class TestUI extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        String dialogRes = JOptionPane.showInputDialog(null, "Please enter an ADB command", "Enter ADB Command", JOptionPane.INFORMATION_MESSAGE);
-        try {
-            adb.executeAdbCommand(dialogRes, false, false);
-        } catch (InvalidCommandException | IOException ex) {
-            JOptionPane.showMessageDialog(null, ex);
-        }
+        final String dialogRes = JOptionPane.showInputDialog(null, "Please enter an ADB command", "Enter ADB Command", JOptionPane.INFORMATION_MESSAGE);
+        Output out = new Output();
+        out.setVisible(true);
+        final StringBuilder sb = null;
+        SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
+            @Override
+            public Void doInBackground() throws InvalidCommandException, IOException {
+                 
+                sb.append(adb.executeAdbCommandReturnAll(dialogRes, false, false));
+                return null;
+            }
+        };
+        out.jTextArea1.append(sb.toString());
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
