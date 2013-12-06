@@ -53,7 +53,7 @@ public final class Fastboot {
         }
         return str;
     }
-    private final Command cmd = new Command();
+    Command cmd;
     
     /**
      * Executes fastboot command without returning executable's output.

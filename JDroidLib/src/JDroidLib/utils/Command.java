@@ -21,7 +21,6 @@ package JDroidLib.utils;
 
 import java.io.*;
 import java.util.*;
-import java.util.logging.Logger;
 import javax.swing.*;
 
 /**
