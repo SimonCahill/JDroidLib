@@ -29,20 +29,70 @@ import JDroidLib.util.*;
  *
  * @author beatsleigher
  */
+@SuppressWarnings({"FieldMayBeFinal"})
 public class Device {
     
     private CaptainKirk controller = null;
     
-    /*  private SU su = null;
-        private BusyBox busybox = null;
-        private Battery battery = null;*/
+    private SU su = null;
+    private BusyBox busybox = null;
+    private Battery battery = null;
     private DeviceState state = null;
+    private CPU cpu = null;
     private String serial = null;
     
     public Device(String deviceSerial) {
         this.serial = deviceSerial;
-        
         controller = new CaptainKirk();
+        su = new SU(serial);
+        busybox = new BusyBox(serial);
+        battery = new Battery(serial);
+        cpu = new CPU(serial);
     }
+    
+    /**
+     * Gets the devices current state and
+     * @return device state.
+     * @throws IOException if something went wrong.
+     */
+    public DeviceState getState() throws IOException {
+        List<String> devices = controller.getConnectedDevices();
+        
+        for (int i = 0; i < devices.size(); i++) {
+            String[] arr = devices.get(i).split("\t");
+            if (arr[0].equals(serial)) {
+                switch (arr[1]) {
+                    case "device":
+                        state = DeviceState.DEVICE;
+                        break;
+                    case "offline":
+                        state = DeviceState.OFFLINE;
+                        break;
+                    case "recovery":
+                        state = DeviceState.RECOVERY;
+                        break;
+                    case "fastboot":
+                        state = DeviceState.FASTBOOT;
+                        break;
+                    default: 
+                        state = DeviceState.UNKNOWN;
+                        break;
+                }
+                break;
+            }
+        }
+        
+        return state;
+    }
+    
+    public SU getSU() { return su; }
+    
+    public BusyBox getBusybox() { return busybox; }
+    
+    public Battery getBattery() { return battery; }
+    
+    public CPU getCPU() { return cpu; }
+    
+    public String getSerial() { return serial; }
     
 }

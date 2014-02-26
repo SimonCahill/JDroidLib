@@ -49,11 +49,10 @@ public class ADBController {
     
     public ADBController() throws IOException {
         controller = new CaptainKirk();
-        update();
     }
     
-    private void update() throws IOException {
-        
+    public Device getDevice(String serial) {
+        return new Device(serial);
     }
     
 }
