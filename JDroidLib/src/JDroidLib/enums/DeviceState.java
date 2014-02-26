@@ -1,5 +1,4 @@
-/*
- * Copyright (C) 2013 Simon.
+ /* Copyright (C) 2014 beatsleigher.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -21,8 +20,8 @@ package JDroidLib.enums;
 
 /**
  *
- * @author Simon
+ * @author beatsleigher
  */
 public enum DeviceState {
-    ANDROID, FASTBOOT, OFFLINE, RECOVERY, UNKNOWN
+    DEVICE, OFFLINE, RECOVERY, FASTBOOT, UNKNOWN
 }

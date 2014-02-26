@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 Simon.
+ * Copyright (C) 2014 beatsleigher.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -17,12 +17,12 @@
  * MA 02110-1301  USA
  */
 
-package JDroidLib.enums;
+package JDroidLib.android.device;
 
 /**
  *
- * @author Simon
+ * @author beatsleigher
  */
-public enum FastbootImgType {
-    SYSTEM, BOOT, USERDATA, RECOVERY, RADIO, BOOTLOADER, UNLOCKTOKEN;
+public class BuildProp {
+    
 }

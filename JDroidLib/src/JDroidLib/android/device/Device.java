@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 Simon.
+ * Copyright (C) 2014 beatsleigher.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -17,13 +17,32 @@
  * MA 02110-1301  USA
  */
 
-package JDroidLib.exceptions;
+package JDroidLib.android.device;
+
+import java.io.*;
+import java.util.*;
+
+import JDroidLib.enums.*;
+import JDroidLib.util.*;
 
 /**
  *
- * @author Simon
+ * @author beatsleigher
  */
-public class InvalidCommandException extends Exception {
-    public InvalidCommandException() { super(); }
-    public InvalidCommandException(String details) { super("JDroidLib.exceptions.InvalidCommandException " + details); }
+public class Device {
+    
+    private CaptainKirk controller = null;
+    
+    /*  private SU su = null;
+        private BusyBox busybox = null;
+        private Battery battery = null;*/
+    private DeviceState state = null;
+    private String serial = null;
+    
+    public Device(String deviceSerial) {
+        this.serial = deviceSerial;
+        
+        controller = new CaptainKirk();
+    }
+    
 }
