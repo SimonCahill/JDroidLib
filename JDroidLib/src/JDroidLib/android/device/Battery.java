@@ -78,7 +78,7 @@ public class Battery {
     
     private void update() throws IOException {
         String[] commands = {"dumpsys", "battery"};
-        String raw = commander.executeADBCommand(true, isPresent, serial, commands);
+        String raw = commander.executeADBCommand(true, false, serial, commands);
         BufferedReader reader = new BufferedReader(new StringReader(raw));
             String line = "";
             while ((line = reader.readLine()) != null) {
