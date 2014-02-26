@@ -19,10 +19,63 @@
 
 package JDroidLib.android.device;
 
+import JDroidLib.util.CaptainKirk;
+
+import java.io.*;
+
 /**
- *
+ * This class allows you to easily grab build properties from the Android OS.
  * @author beatsleigher
  */
 public class BuildProp {
+    
+    String serial = "";
+    String propFile = "";
+    CaptainKirk commander = null;
+    
+    public BuildProp(String serial) {
+        this.serial = serial;
+        commander = new CaptainKirk();
+    }
+    
+    /**
+     * Gets build property from Android device.
+     * @param prop the property to be found and returned.
+     * @return the desired property, or "Not Found" if property wasn't found.
+     * @throws IOException  if something went wrong.
+     */
+    public String getProp(String prop) throws IOException {
+        String returnVal = "Not Found.";
+        pullProp(System.getProperty("user.home") + "/.jdroidlib/tmp");
+        
+        BufferedReader reader = new BufferedReader(new FileReader(new File(propFile)));
+        String line = "";
+        while ((line = reader.readLine()) != null) {
+            if (line.contains(prop)) {
+                String[] found = line.split("\\=");
+                returnVal = found[1];
+                break;
+            }
+        }
+        reader.close();
+        
+        return returnVal;
+    }
+    
+    /**
+     * Pulls the build.prop file from the Android device to a desired location on the hard drive.
+     * @param dest on the hard drive, to pull the file to. ONLY USE DIRECTORIES THAT EXIST!
+     * @throws IOException if something goes wrong.
+     */
+    public void pullProp(String dest) throws IOException {
+        String[] commands = {"pull", "/system/build.prop", dest + "/build.prop"};
+        String str = commander.executeADBCommand(false, false, serial, commands);
+        propFile = dest + "/build.prop";
+    }
+    
+    public void pushProp(String prop) throws IOException {
+        String[] commands = {"push", prop, "/System/"};
+        commander.executeADBCommand(false, true, serial, commands);
+    }
     
 }
