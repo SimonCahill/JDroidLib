@@ -73,6 +73,11 @@ public class BuildProp {
         propFile = dest + "/build.prop";
     }
     
+    /**
+     * Pushes a (for example) modified build.prop file to Android device.
+     * @param prop to be pushed to device.
+     * @throws IOException if something went wrong.
+     */
     public void pushProp(String prop) throws IOException {
         String[] commands = {"push", prop, "/System/"};
         commander.executeADBCommand(false, true, serial, commands);
