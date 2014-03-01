@@ -84,51 +84,51 @@ public class Battery {
             while ((line = reader.readLine()) != null) {
                 if (line.equals("Current Battery Service State:")) continue;
                 if (line.contains("AC powered:")) {
-                    String[] arr = line.split("\\:");
+                    String[] arr = line.split(": ");
                     isACPowered = Boolean.valueOf(arr[1]);
                 }
                 if (line.contains("USB powered: ")) {
-                    String[] arr = line.split("\\:");
+                    String[] arr = line.split(": ");
                     isUSBPowered = Boolean.valueOf(arr[1]);
                 }
                 if (line.contains("Wireless powered: ")) {
-                    String[] arr = line.split("\\:");
+                    String[] arr = line.split(": ");
                     isWirelessPowered = Boolean.valueOf(arr[1]);
                 }
                 if (line.contains("status: ")) {
-                    String[] arr = line.split("\\:");
+                    String[] arr = line.split(": ");
                     batteryStatus = Integer.valueOf(arr[1]);
                 }
                 if (line.contains("health: ")) {
-                    String[] arr = line.split("\\:");
+                    String[] arr = line.split(": ");
                     batteryHealth = Integer.valueOf(arr[1]);
                 }
                 if (line.contains("present: ")) {
-                    String[] arr = line.split("\\:");
+                    String[] arr = line.split(": ");
                     isPresent = Boolean.valueOf(arr[1]);
                 }
                 if (line.contains("level:")) {
-                    String[] arr = line.split("\\:");
+                    String[] arr = line.split(": ");
                     batteryLevel = Integer.valueOf(arr[1]);
                 }
                 if (line.contains("scale: ")) {
-                    String[] arr = line.split("\\:");
+                    String[] arr = line.split(": ");
                     batteryScale = Integer.valueOf(arr[1]);
                 }
                 if (line.contains("voltage: ")) {
-                    String[] arr = line.split("\\:");
+                    String[] arr = line.split(": ");
                     batteryVoltage = Integer.valueOf(arr[1]);
                 }
                 if (line.contains("current now: ")) {
-                    String[] arr = line.split("\\:");
+                    String[] arr = line.split(": ");
                     currentBatteryCurrent = Integer.valueOf(arr[1]);
                 }
                 if (line.contains("temperatur: ")) {
-                    String[] arr = line.split("\\:");
+                    String[] arr = line.split(": ");
                     batteryTemp = Integer.valueOf(arr[1]);
                 }
                 if (line.contains("technology: ")) {
-                    String[] arr = line.split("\\:");
+                    String[] arr = line.split(": ");
                     batteryTechnology = arr[1];
                 }
             }
