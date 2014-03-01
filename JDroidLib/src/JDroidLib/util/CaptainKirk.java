@@ -135,7 +135,7 @@ public class CaptainKirk {
         // Execute command/
         //////////////////
         args.add(fastboot.toString());
-        if (deviceSerial != null | !deviceSerial.equals(""))
+        if (deviceSerial != null)
             args.add("-s " + deviceSerial);
         args.addAll(Arrays.asList(commands));
         process.command(args);
