@@ -94,7 +94,7 @@ public class CaptainKirk {
         // Execute command/
         //////////////////
         args.add(adb.toString());
-        if (deviceSerial != null | !deviceSerial.equals(""))
+        if (deviceSerial != null)
                 args.add("-s " + deviceSerial);
         if (shell)
             args.add("shell");

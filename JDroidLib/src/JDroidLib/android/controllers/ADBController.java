@@ -47,6 +47,23 @@ public class ADBController {
         return controller.getConnectedDevices();
     }
     
+    public void startServer() throws IOException {
+        controller.executeADBCommand(false, false, null, new String[]{"start-server"});
+    }
+    
+    public void stopServer() throws IOException {
+        controller.executeADBCommand(false, false, null, new String[]{"stop-server"});
+    }
+    
+    public void restartServer() throws IOException {
+        controller.executeADBCommand(false, false, null, new String[]{"stop-server"});
+        controller.executeADBCommand(false, false, null, new String[]{"start-server"});
+    }
+    
+    public List<String> getConnectedDevices() throws IOException {
+        return connectedDevices();
+    }
+    
     public ADBController() throws IOException {
         controller = new CaptainKirk();
     }
