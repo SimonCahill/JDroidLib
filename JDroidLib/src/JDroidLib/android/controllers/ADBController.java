@@ -64,6 +64,10 @@ public class ADBController {
         return connectedDevices();
     }
     
+    public List<String> getConnectedFastbootDevices() throws IOException {
+        return controller.getConnectedFastbootDevices();
+    }
+    
     public ADBController() throws IOException {
         controller = new CaptainKirk();
     }

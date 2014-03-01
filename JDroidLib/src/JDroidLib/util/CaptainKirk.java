@@ -268,6 +268,25 @@ public class CaptainKirk {
         return devices;
     }
     
+    /**
+     * Gets a list (String) of devices connected to the computer in fastboot mode.
+     * @return list of devices and respective modes.
+     * @throws IOException if something went wrong.
+     */
+    public List<String> getConnectedFastbootDevices() throws IOException {
+        List<String> devs = new ArrayList();
+        
+        String raw = executeFastbootCommand(null, new String[]{"devices"});
+        BufferedReader reader = new BufferedReader(new StringReader(raw));
+        String line = "";
+        while ((line = reader.readLine()) != null) {
+            if (line.startsWith("List "))
+                continue;
+            devs.add(line);
+        }
+        return devs;
+    }
+    
 }
 
 /*Please ignore this. This is just here, so I don't always have to open methods, but can just C&P comments I need.*/
