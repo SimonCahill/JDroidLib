@@ -192,14 +192,16 @@ public class CaptainKirk {
         //////////////////
         args.add(adb.toString());
         if (deviceSerial != null | !deviceSerial.equals("")) {
-            args.add("-s " + deviceSerial);
+            args.add("-s");
+            args.add(deviceSerial);
         }
         switch (mode) {
             case ANDROID:
                 args.add("reboot");
                 break;
             case RECOVERY:
-                args.add("reboot recovery");
+                args.add("reboot");
+                args.add("recovery");
                 break;
             case BOOTLOADER:
                 args.add("reboot-bootloader");
