@@ -23,6 +23,7 @@ import java.io.*;
 
 import JDroidLib.util.*;
 import JDroidLib.android.device.*;
+import JDroidLib.enums.RebootTo;
 
 /**
  *
@@ -74,6 +75,54 @@ public class ADBController {
     
     public Device getDevice(String serial) {
         return new Device(serial);
+    }
+    
+    /**
+     * Allows execution of custom ADB commands, used for data capsuling, so brainy Brian don't get too much attention. He got ADHD. Poor fella.
+     * @param asShell Execute as shell command.
+     * @param remountDevice Self explanatory...
+     * @param serial of the device. (Set to null, if not device specific.)
+     * @param cmds you want to execute.
+     * @return ADB output.
+     * @throws IOException if something went wrong. 
+     */
+    public String executeADBCommand(boolean asShell, boolean remountDevice, String serial, String[] cmds) throws IOException {
+        return controller.executeADBCommand(asShell, remountDevice, serial, cmds);
+    }
+    
+    /**
+     * Allows for execution of custom fastboot commands, used for data capsuling.
+     * @param deviceSerial for device-specific commands. Set to null, if not device specific.
+     * @param cmds you want to execute.
+     * @return fastboot output.
+     * @throws IOException if something went wrong.
+     */
+    public String executeFastbootCommand(String deviceSerial, String[] cmds) throws IOException {
+        return controller.executeFastbootCommand(deviceSerial, cmds);
+    }
+    
+    /**
+     * Allows for easy rebooting of device.
+     * Just import the enum RebootTo, and then choose your fait.
+     * @param deviceSerial for specific device reboots.
+     * @param mode to reboot the device to.
+     * @return ADB output.
+     * @throws IOException if something went wrong.
+     */
+    public String rebootDevice(String deviceSerial, RebootTo mode) throws IOException {
+        return controller.ADB_rebootDevice(deviceSerial, mode);
+    }
+    
+    /**
+     * Allows for easy rebooting of device.
+     * Just import the enum RebootTo, and then choose your fait.
+     * @param deviceSerial for specific device reboots.
+     * @param mode to reboot the device to.
+     * @return ADB output.
+     * @throws IOException if something went wrong.
+     */
+    public String rebootDeviceFastboot(String deviceSerial, RebootTo mode) throws IOException {
+        return controller.fastboot_rebootDevice(deviceSerial, mode);
     }
     
 }
