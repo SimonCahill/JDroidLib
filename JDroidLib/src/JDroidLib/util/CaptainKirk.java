@@ -320,6 +320,16 @@ public class CaptainKirk {
         }
         return devs;
     }
+    
+    /**
+     * Restarts the ADB deamon as a root user, and allows for more administrative functions to work.
+     * @param serial of the device to root.
+     * @return the ADB output.
+     * @throws IOException if something went wrong.
+     */
+    public String restartADBAsRoot(String serial) throws IOException {
+        return executeADBCommand(false, false, serial, new String[]{"root"});
+    }
 
 }
 
