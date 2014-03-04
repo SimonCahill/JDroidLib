@@ -19,6 +19,8 @@
 
 package JDroidLib.android.device;
 
+import JDroidLib.enums.RebootTo;
+import JDroidLib.exceptions.PropertyNotFoundException;
 import JDroidLib.util.CaptainKirk;
 
 import java.io.*;
@@ -44,6 +46,7 @@ public class BuildProp {
      * @return the desired property, or "Not Found" if property wasn't found.
      * @throws IOException  if something went wrong.
      */
+    @Deprecated
     public String getProp(String prop) throws IOException {
         String returnVal = "Not Found.";
         pullProp(System.getProperty("user.home") + "/.jdroidlib/tmp");
@@ -60,6 +63,64 @@ public class BuildProp {
         reader.close();
         
         return returnVal;
+    }
+    
+    /**
+     * Gets a list of all build properties in Android.
+     * Uses system-own getProp-method.
+     * Use this method instead of the deprecated one.
+     * @return
+     * @throws IOException 
+     */
+    public String getProp() throws IOException {
+        String output = commander.executeADBCommand(true, false, serial, new String[]{"getprop"});
+        String toReturn = "";
+        BufferedReader reader = new BufferedReader(new StringReader(output));
+        String line = "";
+        while ((line = reader.readLine()) != null) {
+            line.trim();
+            line.replace("[", "");
+            line.replace("]", "");
+            line.replace(":", " = ");
+            toReturn += line + "\n";
+        }
+        return toReturn;
+    }
+    
+    /**
+     * Pulls a list of properties from the device, then checks for the desired property.
+     * @param key of the property (property name).
+     * @return the desired property
+     * @throws IOException 
+     * @throws JDroidLib.exceptions.PropertyNotFoundException 
+     */
+    public String getSingleProperty(String key) throws IOException, PropertyNotFoundException {
+        String returnString = "";
+        String properties = getProp();
+        BufferedReader reader = new BufferedReader(new StringReader(properties));
+        String line = "";
+        
+        while ((line = reader.readLine()) != null) {
+            if (line.startsWith(key)) {
+                String[] prop = line.split(" = ");
+                return prop[1];
+            }
+        }
+        
+        throw new PropertyNotFoundException("Could not find property \"" + key + "\".");
+    }
+    
+    /**
+     * Attempts to set a build property in the Android system.
+     * @param key to set value of.
+     * @param value to set.
+     * @param rebootAfter setting value.
+     * @throws IOException if something went wrong.
+     */
+    public void setProp(String key, String value, boolean rebootAfter) throws IOException {
+        commander.executeADBCommand(true, false, serial, new String[]{"setprop", key, value});
+        if (rebootAfter)
+            commander.ADB_rebootDevice(serial, RebootTo.ANDROID);
     }
     
     /**
