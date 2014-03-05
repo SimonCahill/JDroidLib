@@ -41,15 +41,20 @@ public class CaptainKirk {
      */
     public CaptainKirk() {
         resMan = new ResourceManager();
-        if (System.getProperty("os.name").equals("Linux")) {
+        if (System.getProperty("os.name").toLowerCase().equals("linux")) {
             resMan.install(OS.LINUX, "Default");
-        } else if (System.getProperty("os.name").contains("Mac")) {
+        } else if (System.getProperty("os.name").toLowerCase().contains("mac")) {
             resMan.install(OS.MAC_OS, "Default");
         } else {
             resMan.install(OS.WINDOWS, "Default");
         }
-        adb = new File(System.getProperty("user.home") + "/.jdroidlib/bin/adb");
-        fastboot = new File(System.getProperty("user.home") + "/.jdroidlib/bin/fastboot");
+        if (System.getProperty("os.name").toLowerCase().equals("linux") || System.getProperty("os.name").toLowerCase().contains("mac")) {
+            adb = new File(System.getProperty("user.home") + "/.jdroidlib/bin/adb");
+            fastboot = new File(System.getProperty("user.home") + "/.jdroidlib/bin/fastboot");
+        } else {
+            adb = new File(System.getProperty("user.home") + "/.jdroidlib/bin/adb.exe");
+            fastboot = new File(System.getProperty("user.home") + "/.jdroidlib/bin/fastboot.exe");
+        }
     }
 
     /**

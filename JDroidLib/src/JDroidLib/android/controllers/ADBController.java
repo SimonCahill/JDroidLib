@@ -30,7 +30,7 @@ import JDroidLib.enums.RebootTo;
  * @author beatsleigher
  */
 @SuppressWarnings({"MismatchedQueryAndUpdateOfCollection", "UnusedAssignment", "StringConcatenationInsideStringBufferAppend", "ConvertToTryWithResources"})
-public class ADBController {
+public final class ADBController {
     
     CaptainKirk controller = null;
     Device device = null;
@@ -65,12 +65,32 @@ public class ADBController {
         return connectedDevices();
     }
     
+    /**
+     * gets a list of all connected fasboot devices (device connected to computer via fastboot.)
+     * @return
+     * @throws IOException 
+     */
     public List<String> getConnectedFastbootDevices() throws IOException {
         return controller.getConnectedFastbootDevices();
     }
     
+    /**
+     * Default constructor.
+     * @throws IOException 
+     */
     public ADBController() throws IOException {
         controller = new CaptainKirk();
+        startServer();
+    }
+    
+    /**
+     * Disposes of all the class variables uses, to prevent memory leaks.
+     * @throws IOException 
+     */
+    public void dispose() throws IOException {
+        stopServer();
+        controller = null;
+        device = null;
     }
     
     public Device getDevice(String serial) {
