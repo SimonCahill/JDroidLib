@@ -18,12 +18,12 @@
  */
 
 package JDroidLib.android.device;
+import JDroidLib.android.controllers.ADBController;
 
 import java.io.*;
 import java.util.*;
 
 import JDroidLib.enums.*;
-import JDroidLib.util.*;
 
 /**
  *
@@ -32,22 +32,24 @@ import JDroidLib.util.*;
 @SuppressWarnings({"FieldMayBeFinal"})
 public class Device {
     
-    private CaptainKirk controller = null;
+    private ADBController adbController = null;
     
     private SU su = null;
     private BusyBox busybox = null;
     private Battery battery = null;
+    private BuildProp buildProp = null;
     private DeviceState state = null;
     private CPU cpu = null;
     private String serial = null;
     
-    public Device(String deviceSerial) {
+    public Device(String deviceSerial, ADBController adbController) {
         this.serial = deviceSerial;
-        controller = new CaptainKirk();
-        su = new SU(serial);
-        busybox = new BusyBox(serial);
-        battery = new Battery(serial);
-        cpu = new CPU(serial);
+        this.adbController = adbController;
+        su = new SU(serial, adbController);
+        busybox = new BusyBox(serial, adbController);
+        battery = new Battery(serial, adbController);
+        cpu = new CPU(serial, adbController);
+        buildProp = new BuildProp(serial, adbController);
     }
     
     /**
@@ -56,7 +58,7 @@ public class Device {
      * @throws IOException if something went wrong.
      */
     public DeviceState getState() throws IOException {
-        List<String> devices = controller.getConnectedDevices();
+        List<String> devices = adbController.getConnectedDevices();
         
         for (int i = 0; i < devices.size(); i++) {
             String[] arr = devices.get(i).split("\t");
@@ -94,5 +96,7 @@ public class Device {
     public CPU getCPU() { return cpu; }
     
     public String getSerial() { return serial; }
+    
+    public BuildProp getBuildProp() { return buildProp; }
     
 }

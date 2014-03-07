@@ -24,6 +24,7 @@ import java.io.*;
 import JDroidLib.util.*;
 import JDroidLib.android.device.*;
 import JDroidLib.enums.RebootTo;
+import net.lingala.zip4j.exception.ZipException;
 
 /**
  *
@@ -77,8 +78,10 @@ public final class ADBController {
     /**
      * Default constructor.
      * @throws IOException 
+     * @throws ZipException 
+     * @throws InterruptedException 
      */
-    public ADBController() throws IOException {
+    public ADBController() throws IOException, ZipException, InterruptedException {
         controller = new CaptainKirk();
         startServer();
     }
@@ -94,7 +97,7 @@ public final class ADBController {
     }
     
     public Device getDevice(String serial) {
-        return new Device(serial);
+        return new Device(serial, this);
     }
     
     /**

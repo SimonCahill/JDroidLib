@@ -19,7 +19,7 @@
 
 package JDroidLib.android.device;
 
-import JDroidLib.util.*;
+import JDroidLib.android.controllers.ADBController;
 
 import java.io.*;
 
@@ -34,16 +34,16 @@ public class BusyBox {
     private boolean isInstalled = false;
     private String busyboxVersion = "";
     
-    private CaptainKirk commander = null;
+    private ADBController adbController = null;
     
-    public BusyBox(String serial) {
+    public BusyBox(String serial, ADBController adbController) {
         this.serial = serial;
-        commander = new CaptainKirk();
+        this.adbController = adbController;
     }
     
     private void update() throws IOException {
         String[] cmd = {"busybox"};
-        String raw = commander.executeADBCommand(true, false, serial, cmd);
+        String raw = adbController.executeADBCommand(true, false, serial, cmd);
         BufferedReader reader = new BufferedReader(new StringReader(raw));
         String line = "";
         while ((line = reader.readLine()) != null) {

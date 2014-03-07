@@ -19,7 +19,7 @@
 
 package JDroidLib.android.device;
 
-import JDroidLib.util.*;
+import JDroidLib.android.controllers.ADBController;
 
 import java.io.*;
 
@@ -45,11 +45,11 @@ public class Battery {
     private String batteryTechnology = "";
     private String serial = "";
     
-    private CaptainKirk commander = null;
+    private ADBController adbController = null;
     
-    public Battery(String serial) {
+    public Battery(String serial, ADBController adbController) {
         this.serial = serial;
-        commander = new CaptainKirk();
+        this.adbController = adbController;
     }
     
     public boolean isACPowered() throws IOException { update(); return isACPowered; }
@@ -78,7 +78,7 @@ public class Battery {
     
     private void update() throws IOException {
         String[] commands = {"dumpsys", "battery"};
-        String raw = commander.executeADBCommand(true, false, serial, commands);
+        String raw = adbController.executeADBCommand(true, false, serial, commands);
         BufferedReader reader = new BufferedReader(new StringReader(raw));
             String line = "";
             while ((line = reader.readLine()) != null) {

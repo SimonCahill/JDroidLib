@@ -21,6 +21,7 @@ import JDroidLib.enums.*;
 
 import java.io.*;
 import java.util.*;
+import net.lingala.zip4j.exception.ZipException;
 
 /**
  * This is Captain Kirk! Say hello! He will be our commander and captain,
@@ -38,8 +39,11 @@ public class CaptainKirk {
 
     /**
      * Default constructor: Installs ADB/fastboot and gets other data.
+     * @throws IOException if something happens while extracting the files to the hard drive...
+     * @throws ZipException if something happens while un-zipping the extracted files...
+     * @throws InterruptedException if the thread's sleep(s) get interrupted. Don't ask why it needs to sleep. Let's just say it'll get cranky if it doesn't.
      */
-    public CaptainKirk() {
+    public CaptainKirk() throws IOException, ZipException, InterruptedException {
         resMan = new ResourceManager();
         if (System.getProperty("os.name").toLowerCase().equals("linux")) {
             resMan.install(OS.LINUX, "Default");

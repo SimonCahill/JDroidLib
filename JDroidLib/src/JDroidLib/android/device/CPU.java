@@ -19,7 +19,7 @@
 
 package JDroidLib.android.device;
 
-import JDroidLib.util.CaptainKirk;
+import JDroidLib.android.controllers.ADBController;
 
 import java.util.*;
 import java.io.*;
@@ -30,15 +30,15 @@ import java.io.*;
  */
 public class CPU {
     
-    private CaptainKirk commander = null;
+    private ADBController adbController = null;
     
     String serial = "";
     String[] cpuLoad = null;
     List<String>cpuUsage = null;
     
-    public CPU(String serial) {
+    public CPU(String serial, ADBController adbController) {
         this.serial = serial;
-        commander = new CaptainKirk();
+        this.adbController = adbController;
         cpuUsage = new ArrayList();
     }
     
@@ -48,7 +48,7 @@ public class CPU {
      */
     private void update() throws IOException {
         String[] cmd = {"dumpsys", "cpuinfo"};
-        String raw = commander.executeADBCommand(true, false, serial, cmd);
+        String raw = adbController.executeADBCommand(true, false, serial, cmd);
         BufferedReader reader = new BufferedReader(new StringReader(raw));
         String line = "";
         cpuUsage.clear();

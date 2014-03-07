@@ -21,7 +21,7 @@ package JDroidLib.android.device;
 
 import JDroidLib.enums.RebootTo;
 import JDroidLib.exceptions.PropertyNotFoundException;
-import JDroidLib.util.CaptainKirk;
+import JDroidLib.android.controllers.ADBController;
 
 import java.io.*;
 
@@ -33,11 +33,11 @@ public class BuildProp {
     
     String serial = "";
     String propFile = "";
-    CaptainKirk commander = null;
+    ADBController adbController = null;
     
-    public BuildProp(String serial) {
+    public BuildProp(String serial, ADBController adbController) {
         this.serial = serial;
-        commander = new CaptainKirk();
+        this.adbController = adbController;
     }
     
     /**
@@ -73,7 +73,7 @@ public class BuildProp {
      * @throws IOException 
      */
     public String getProp() throws IOException {
-        String output = commander.executeADBCommand(true, false, serial, new String[]{"getprop"});
+        String output = adbController.executeADBCommand(true, false, serial, new String[]{"getprop"});
         String toReturn = "";
         BufferedReader reader = new BufferedReader(new StringReader(output));
         String line = "";
@@ -118,9 +118,9 @@ public class BuildProp {
      * @throws IOException if something went wrong.
      */
     public void setProp(String key, String value, boolean rebootAfter) throws IOException {
-        commander.executeADBCommand(true, false, serial, new String[]{"setprop", key, value});
+        adbController.executeADBCommand(true, false, serial, new String[]{"setprop", key, value});
         if (rebootAfter)
-            commander.ADB_rebootDevice(serial, RebootTo.ANDROID);
+            adbController.rebootDevice(serial, RebootTo.ANDROID);
     }
     
     /**
@@ -130,7 +130,7 @@ public class BuildProp {
      */
     public void pullProp(String dest) throws IOException {
         String[] commands = {"pull", "/system/build.prop", dest + "/build.prop"};
-        String str = commander.executeADBCommand(false, false, serial, commands);
+        String str = adbController.executeADBCommand(false, false, serial, commands);
         propFile = dest + "/build.prop";
     }
     
@@ -141,7 +141,7 @@ public class BuildProp {
      */
     public void pushProp(String prop) throws IOException {
         String[] commands = {"push", prop, "/System/"};
-        commander.executeADBCommand(false, true, serial, commands);
+        adbController.executeADBCommand(false, true, serial, commands);
     }
     
 }

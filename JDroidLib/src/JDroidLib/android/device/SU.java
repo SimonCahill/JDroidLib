@@ -19,7 +19,7 @@
 
 package JDroidLib.android.device;
 
-import JDroidLib.util.CaptainKirk;
+import JDroidLib.android.controllers.ADBController;
 
 import java.io.*;
 
@@ -30,20 +30,20 @@ import java.io.*;
 public class SU {
     
     String serial = "";
-    CaptainKirk commander = null;
+    ADBController adbController = null;
     
     boolean isInstalled = false;
     boolean hasRoot = false;
     String suVersion = "";
     
-    public SU(String serial) {
+    public SU(String serial, ADBController adbController) {
         this.serial = serial;
-        commander = new CaptainKirk();
+        this.adbController = adbController;
     }
     
     private void update() throws IOException {
         String[] cmd = {"su", "-v"};
-        String raw = commander.executeADBCommand(true, false, serial, cmd);
+        String raw = adbController.executeADBCommand(true, false, serial, cmd);
         BufferedReader reader = new BufferedReader(new StringReader(raw));
         String line = "";
         while ((line = reader.readLine()) != null) {

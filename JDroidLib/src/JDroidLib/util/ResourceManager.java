@@ -13,20 +13,29 @@ import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
 
 /**
- *
+ * ResourceManager - Manages resources used in JDroidLib.
+ * Used to install ADB and fastboot to current computer, to either a custom location or the default location.
+ * JDroidLib, when used, will always use the default locations to install and use ADB and fastboot.
+ * However, you can install ADB and fastboot to custom locations, to, for example, allow non-Java applications to use ADB and fastboot on the desired system.
  * @author beatsleigher
+ * @since Beta 0.0
+ * @version 1.0
  */
 public class ResourceManager {
 
     /**
-     * Installs ADB to system. Is called by AndroidController or Commander by
+     * Installs ADB to system. Is called by ADBController or CaptainKirk by
      * default. This method/class can be used to install ADB/fastboot to a
      * custom location on the drive.
      *
      * @param os the current platform.
      * @param location the installation dir. NEVER INPUT AN ACTUAL FILE HERE!
+     * @throws IOException,
+     * @throws ZipException
+     * and also
+     * @throws InterruptedException if something goes wrong.
      */
-    public void install(OS os, String location) {
+    public void install(OS os, String location) throws IOException, ZipException, InterruptedException {
         if (location.equals("Default")) {
             new Installer().install(os, new File(System.getProperty("user.home") + "/.jdroidlib/bin/"));
         } else {
@@ -34,9 +43,12 @@ public class ResourceManager {
         }
     }
 
+    /**
+     * You are not meant to understand this code.
+     */
     private class Installer {
 
-        public void install(OS os, File location) {
+        public void install(OS os, File location) throws IOException, ZipException, InterruptedException {
             switch (os) {
                 case LINUX:
                     installOnLinux(location);
@@ -50,7 +62,7 @@ public class ResourceManager {
             }
         }
 
-        private void installOnLinux(File location) {
+        private void installOnLinux(File location) throws IOException, ZipException, InterruptedException {
             File installDir = new File(location + "/adb_tools.zip");
             if (!installDir.exists()) {
                 try {
@@ -81,10 +93,9 @@ public class ResourceManager {
             }
         }
 
-        private void installOnMac(File location) {
+        private void installOnMac(File location) throws IOException, ZipException, InterruptedException {
             File installDir = new File(location + "/adb_tools.zip");
             if (!installDir.exists()) {
-                try {
                     installDir.getParentFile().mkdirs();
                     InputStream input = this.getClass().getResourceAsStream("/JDroidLib/res/adb_tools/adb-mac.zip");
                     File adb_tools = new File(location + "/adb_tools.zip");
@@ -106,16 +117,12 @@ public class ResourceManager {
                     pr = process.start();
                     Thread.sleep(200);
                     pr.destroy();
-                } catch (IOException | ZipException | InterruptedException ex) {
-                    System.err.println("ERROR: Error while extracting adb_tools in " + location + " on system: Mac OS X\n" + ex.toString());
-                }
             }
         }
 
-        private void installOnWin(File location) {
+        private void installOnWin(File location) throws IOException, ZipException, InterruptedException {
             File installDir = new File(location + "/adb_tools.zip");
             if (!installDir.exists()) {
-                try {
                     installDir.getParentFile().mkdirs();
                     InputStream input = this.getClass().getResourceAsStream("/JDroidLib/res/adb_tools/adb-win.zip");
                     File adb_tools = new File(location + "/adb_tools.zip");
@@ -129,9 +136,6 @@ public class ResourceManager {
                     output.close();
                     ZipFile zip = new ZipFile(adb_tools);
                     zip.extractAll(location.toString());
-                } catch (IOException | ZipException ex) {
-                    System.err.println("ERROR: Error while extracting adb_tools in " + location + " on system: Windoze\n" + ex.toString());
-                }
             }
         }
     }
