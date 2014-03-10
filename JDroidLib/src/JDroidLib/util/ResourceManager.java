@@ -87,6 +87,7 @@ public class ResourceManager {
                     pr = process.start();
                     Thread.sleep(200);
                     pr.destroy();
+                    adb_tools.delete();
                 } catch (IOException | ZipException | InterruptedException ex) {
                     System.err.println("ERROR: Error while extracting adb_tools in " + location + " on system: Linux\n" + ex.toString());
                 }
@@ -117,6 +118,7 @@ public class ResourceManager {
                     pr = process.start();
                     Thread.sleep(200);
                     pr.destroy();
+                    adb_tools.delete();
             }
         }
 
@@ -136,6 +138,7 @@ public class ResourceManager {
                     output.close();
                     ZipFile zip = new ZipFile(adb_tools);
                     zip.extractAll(location.toString());
+                    adb_tools.delete();
             }
         }
     }

@@ -55,7 +55,7 @@ public class BuildProp {
         String line = "";
         while ((line = reader.readLine()) != null) {
             if (line.contains(prop)) {
-                String[] found = line.split("\\=");
+                String[] found = line.split("=");
                 returnVal = found[1];
                 break;
             }
@@ -78,11 +78,11 @@ public class BuildProp {
         BufferedReader reader = new BufferedReader(new StringReader(output));
         String line = "";
         while ((line = reader.readLine()) != null) {
-            line.trim();
-            line.replace("[", "");
-            line.replace("]", "");
-            line.replace(":", " = ");
-            toReturn += line + "\n";
+            String s1 = line.trim();
+            String s2 = s1.replaceAll("\\[", "");
+            String s3 = s2.replace("]", "");
+            String s4 = s3.replace(":", " = ");
+            toReturn += s4 + "\n";
         }
         return toReturn;
     }

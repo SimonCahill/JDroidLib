@@ -54,10 +54,14 @@ public class CaptainKirk {
         }
         if (System.getProperty("os.name").toLowerCase().equals("linux") || System.getProperty("os.name").toLowerCase().contains("mac")) {
             adb = new File(System.getProperty("user.home") + "/.jdroidlib/bin/adb");
+            adb.deleteOnExit();
             fastboot = new File(System.getProperty("user.home") + "/.jdroidlib/bin/fastboot");
+            fastboot.deleteOnExit();
         } else {
             adb = new File(System.getProperty("user.home") + "/.jdroidlib/bin/adb.exe");
+            adb.deleteOnExit();
             fastboot = new File(System.getProperty("user.home") + "/.jdroidlib/bin/fastboot.exe");
+            fastboot.deleteOnExit();
         }
     }
 
@@ -339,6 +343,7 @@ public class CaptainKirk {
     public String restartADBAsRoot(String serial) throws IOException {
         return executeADBCommand(false, false, serial, new String[]{"root"});
     }
+    
 
 }
 
