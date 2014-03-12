@@ -24,6 +24,8 @@ import java.io.*;
 import JDroidLib.util.*;
 import JDroidLib.android.device.*;
 import JDroidLib.enums.RebootTo;
+import JDroidLib.exceptions.*;
+
 import net.lingala.zip4j.exception.ZipException;
 
 /**
@@ -213,5 +215,33 @@ public final class ADBController {
      * @return 
      */
     public FastbootController getFastbootController() { return fbController; }
+    
+    /**
+     * Attempts to back up selected device.
+     * @param backupAPKs Backup actual .apk files on device
+     * @param backupOBB Backup .obb extensions
+     * @param backupShared Backup SD card data
+     * @param backupSystem Backup all system apps
+     * @param backupAll Backup all installed applications
+     * @param deviceSerial Specific device (set to null to issue command globally)
+     * @param backupFile Please make sure you make this a file, which is accepted by the filesystem. Also, please make sure the file ends in .ab!
+     * @param specificPackages Specify a list of specific packages to be backed up. These will be included, even if backupSystem is false.
+     */
+    public void backupDevice(boolean backupAPKs, boolean backupOBB, boolean backupShared, boolean backupSystem, boolean backupAll, List<String> specificPackages, String deviceSerial, String backupFile) throws IOException, DeviceNotFoundException {
+        List<String> args = new ArrayList();
+        args.add("backup");
+        args.add(backupFile);
+        if (backupAPKs) args.add("-apk"); else args.add("-noapk");
+        if (backupOBB) args.add("-obb"); else args.add("-noobb");
+        if (backupShared) args.add("-shared"); else args.add("-noshared");
+        if (backupAll) args.add("-all");
+        if (backupSystem) args.add("-system"); else args.add("-nosystem");
+        if (specificPackages != null || !specificPackages.isEmpty())
+            for (int i = 0; i < specificPackages.size(); i++) 
+                args.add(specificPackages.get(i));
+        String[] cmds = {"backup", Arrays.deepToString(args.toArray())};
+        String result = executeADBCommand(false, false, deviceSerial, cmds);
+        /*TO-DO: Finish...*/
+    }
     
 }
