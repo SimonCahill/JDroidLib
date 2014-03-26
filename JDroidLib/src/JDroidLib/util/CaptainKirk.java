@@ -17,11 +17,21 @@
  */
 package JDroidLib.util;
 
-import JDroidLib.enums.*;
-
-import java.io.*;
-import java.util.*;
 import net.lingala.zip4j.exception.ZipException;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import JDroidLib.android.controllers.ADBController;
+import JDroidLib.android.device.Device;
+import JDroidLib.enums.OS;
+import JDroidLib.enums.RebootTo;
 
 /**
  * This is Captain Kirk! Say hello! He will be our commander and captain,
@@ -86,7 +96,7 @@ public class CaptainKirk {
         ProcessBuilder process = new ProcessBuilder();
         Process pr = null;
         BufferedReader processReader = null;
-        List<String> args = new ArrayList();
+        List<String> args = new ArrayList<>();
         String line = "";
 
         ////////////////////
@@ -94,7 +104,7 @@ public class CaptainKirk {
         //////////////////
         if (remount) {
             args.add(adb.toString());
-            if (deviceSerial != null | !deviceSerial.equals("")) {
+            if (deviceSerial != null && !deviceSerial.isEmpty()) {
                 args.add("-s " + deviceSerial);
             }
             args.add("remount");
@@ -153,7 +163,7 @@ public class CaptainKirk {
         ProcessBuilder process = new ProcessBuilder();
         Process pr = null;
         BufferedReader processReader = null;
-        List<String> args = new ArrayList();
+        List<String> args = new ArrayList<>();
         String line = "";
 
         ////////////////////
@@ -195,7 +205,7 @@ public class CaptainKirk {
         /////////////////
         StringBuilder str = new StringBuilder();
         ProcessBuilder process = new ProcessBuilder();
-        List<String> args = new ArrayList();
+        List<String> args = new ArrayList<>();
         Process pr = null;
         BufferedReader processReader = null;
         String line = "";
@@ -204,7 +214,7 @@ public class CaptainKirk {
         // Execute command/
         //////////////////
         args.add(adb.toString());
-        if (deviceSerial != null | !deviceSerial.equals("")) {
+        if (deviceSerial != null && !deviceSerial.isEmpty()) {
             args.add("-s");
             args.add(deviceSerial);
         }
@@ -249,7 +259,7 @@ public class CaptainKirk {
         /////////////////
         StringBuilder str = new StringBuilder();
         ProcessBuilder process = new ProcessBuilder();
-        List<String> args = new ArrayList();
+        List<String> args = new ArrayList<>();
         Process pr = null;
         BufferedReader processReader = null;
         String line = "";
@@ -258,7 +268,7 @@ public class CaptainKirk {
         // Execute command/
         //////////////////
         args.add(fastboot.toString());
-        if (deviceSerial != null | !deviceSerial.equals("")) {
+        if (deviceSerial != null && !deviceSerial.isEmpty()) {
             args.add("-s " + deviceSerial);
         }
         switch (mode) {
@@ -292,8 +302,8 @@ public class CaptainKirk {
      * @return devices and device states.
      * @throws IOException if something went wrong.
      */
-    public List<String> getConnectedDevices() throws IOException {
-        List<String> devices = new ArrayList();
+    public List<Device> getConnectedDevices(ADBController controller) throws IOException {
+        List<Device> devices = new ArrayList<>();
         String[] cmd = {"devices"};
 
         String raw = executeADBCommand(false, false, null, cmd);
@@ -303,7 +313,12 @@ public class CaptainKirk {
             if (line.startsWith("List ")) {
                 continue;
             }
-            devices.add(line);
+            if(line.trim().isEmpty())//ignore empty lines
+            {
+                continue;
+            }
+            Device device = new Device(line, controller);
+            devices.add(device);
         }
 
         return devices;
@@ -317,7 +332,7 @@ public class CaptainKirk {
      * @throws IOException if something went wrong.
      */
     public List<String> getConnectedFastbootDevices() throws IOException {
-        List<String> devs = new ArrayList();
+        List<String> devs = new ArrayList<>();
 
         String raw = executeFastbootCommand(null, new String[]{"devices"});
         BufferedReader reader = new BufferedReader(new StringReader(raw));
