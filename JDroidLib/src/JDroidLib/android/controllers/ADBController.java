@@ -18,15 +18,22 @@
 
 package JDroidLib.android.controllers;
 
-import java.util.*;
-import java.io.*;
-
-import JDroidLib.util.*;
-import JDroidLib.android.device.*;
-import JDroidLib.enums.RebootTo;
-import JDroidLib.exceptions.*;
-
 import net.lingala.zip4j.exception.ZipException;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+
+import JDroidLib.android.device.Device;
+import JDroidLib.enums.RebootTo;
+import JDroidLib.exceptions.BackupFileNotAccessibleException;
+import JDroidLib.exceptions.DeviceNotFoundException;
+import JDroidLib.exceptions.EFSNotFoundException;
+import JDroidLib.exceptions.UnableToConnectForBackupException;
+import JDroidLib.util.CaptainKirk;
 
 /**
  * JDroidLib class - Contains methods for communicating with an Android device, which is connected to the computer.
@@ -41,23 +48,22 @@ import net.lingala.zip4j.exception.ZipException;
 public final class ADBController {
     
     CaptainKirk controller = null;
-    Device device = null;
     FastbootController fbController = null;
     
     /**
      * Retrieves a list of connected devices.
      * @return list of devics.
      * @throws IOException 
-     * @author Beatsleigher
+     * @author Beatsleigher, pedja1
      * @since beta
      *
      */
-    private List<String> connectedDevices() throws IOException {
+    private List<Device> connectedDevices() throws IOException {
         ////////////////////
         // Get devices ////
         //////////////////
         
-        return controller.getConnectedDevices();
+        return controller.getConnectedDevices(this);
     }
     
     /**
@@ -98,11 +104,11 @@ public final class ADBController {
      * Returns a list of connected devices via ADB.
      * @return
      * @throws IOException 
-     * @author Beatsleigher
+     * @author Beatsleigher, pedja1
      * @since beta
      *
      */
-    public List<String> getConnectedDevices() throws IOException {
+    public List<Device> getConnectedDevices() throws IOException {
         return connectedDevices();
     }
     
@@ -145,20 +151,7 @@ public final class ADBController {
     public void dispose() throws IOException {
         stopServer();
         controller = null;
-        device = null;
         fbController = null;
-    }
-    
-    /**
-     * Returns an instance of Device, for requested serial number.
-     * @param serial
-     * @return 
-     * @author Beatsleigher
-     * @since beta
-     *
-     */
-    public Device getDevice(String serial) {
-        return new Device(serial, this);
     }
     
     /**

@@ -19,11 +19,7 @@
 
 package JDroidLib.android.device;
 import JDroidLib.android.controllers.ADBController;
-
-import java.io.*;
-import java.util.*;
-
-import JDroidLib.enums.*;
+import JDroidLib.enums.DeviceState;
 
 /**
  *
@@ -31,9 +27,7 @@ import JDroidLib.enums.*;
  */
 @SuppressWarnings({"FieldMayBeFinal"})
 public class Device {
-    
-    private ADBController adbController = null;
-    
+
     private SU su = null;
     private BusyBox busybox = null;
     private Battery battery = null;
@@ -42,48 +36,23 @@ public class Device {
     private CPU cpu = null;
     private String serial = null;
     
-    public Device(String deviceSerial, ADBController adbController) {
-        this.serial = deviceSerial;
-        this.adbController = adbController;
+    public Device(String device, ADBController adbController) {
+        String[] arr = device.split("\t");
+
+        this.serial = arr[0];
         su = new SU(serial, adbController);
         busybox = new BusyBox(serial, adbController);
         battery = new Battery(serial, adbController);
         cpu = new CPU(serial, adbController);
         buildProp = new BuildProp(serial, adbController);
+        state = DeviceState.getState(arr[1]);
     }
     
     /**
      * Gets the devices current state and
      * @return device state.
-     * @throws IOException if something went wrong.
      */
-    public DeviceState getState() throws IOException {
-        List<String> devices = adbController.getConnectedDevices();
-        
-        for (String dev : devices) {
-            String[] arr = dev.split("\t");
-            if (arr[0].equals(serial)) {
-                switch (arr[1]) {
-                    case "device":
-                        state = DeviceState.DEVICE;
-                        break;
-                    case "offline":
-                        state = DeviceState.OFFLINE;
-                        break;
-                    case "recovery":
-                        state = DeviceState.RECOVERY;
-                        break;
-                    case "fastboot":
-                        state = DeviceState.FASTBOOT;
-                        break;
-                    default: 
-                        state = DeviceState.UNKNOWN;
-                        break;
-                }
-                break;
-            }
-        }
-        
+    public DeviceState getState() {
         return state;
     }
     
@@ -98,5 +67,10 @@ public class Device {
     public String getSerial() { return serial; }
     
     public BuildProp getBuildProp() { return buildProp; }
-    
+
+    @Override
+    public String toString()
+    {
+        return String.format("[%s] %s", DeviceState.getState(state), serial);
+    }
 }

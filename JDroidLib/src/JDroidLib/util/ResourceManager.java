@@ -5,12 +5,18 @@
  */
 package JDroidLib.util;
 
-import JDroidLib.enums.OS;
-
-import java.io.*;
-
 import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+
+import JDroidLib.enums.OS;
 
 /**
  * ResourceManager - Manages resources used in JDroidLib.
@@ -141,6 +147,22 @@ public class ResourceManager {
                     adb_tools.delete();
             }
         }
+    }
+
+    /**
+     * Read InputStream to String
+     * @throws java.io.IOException If an I/O error occurs
+     * */
+    public static String readStreamToString(InputStream inputStream) throws IOException
+    {
+        BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
+        String read;
+        StringBuilder sb = new StringBuilder();
+        while((read = br.readLine()) != null)
+        {
+            sb.append(read);
+        }
+        return sb.toString();
     }
 
 }
