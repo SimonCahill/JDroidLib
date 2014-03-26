@@ -60,8 +60,8 @@ public class Device {
     public DeviceState getState() throws IOException {
         List<String> devices = adbController.getConnectedDevices();
         
-        for (int i = 0; i < devices.size(); i++) {
-            String[] arr = devices.get(i).split("\t");
+        for (String dev : devices) {
+            String[] arr = dev.split("\t");
             if (arr[0].equals(serial)) {
                 switch (arr[1]) {
                     case "device":
