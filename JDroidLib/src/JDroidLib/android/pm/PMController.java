@@ -137,4 +137,24 @@ public class PMController
         }
         return sb.toString();
     }
+
+    /**
+     * Uninstall application<br>
+     * @param keepData keep the data and cache directories around after package removal.
+     * @param serial optional param to specify serial of the device on which to execute command
+     */
+    public String uninstallPackage(boolean keepData, String serial, String packageName) throws IOException
+    {
+        String[] cmd = {"pm", "uninstall", keepData ? "-k" : "", packageName};
+
+        StringBuilder sb = new StringBuilder();
+        String raw = controller.executeADBCommand(true, false, serial, cmd);
+        BufferedReader reader = new BufferedReader(new StringReader(raw));
+        String line;
+        while ((line = reader.readLine()) != null)
+        {
+            sb.append(line).append("\n");
+        }
+        return sb.toString();
+    }
 }
