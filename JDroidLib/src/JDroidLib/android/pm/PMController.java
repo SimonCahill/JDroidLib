@@ -80,6 +80,25 @@ public class PMController
 
     /**
      * List all packages on a device
+     * @return List of packages
+     * */
+    public List<Package> listPackages() throws IOException
+    {
+        return listPackages(new PMListPackagesBuilder(), null);
+    }
+
+    /**
+     * List all packages on a device
+     * @param serial optional param to specify serial of the device on which to execute command
+     * @return List of packages
+     * */
+    public List<Package> listPackages(String serial) throws IOException
+    {
+        return listPackages(new PMListPackagesBuilder(), serial);
+    }
+
+    /**
+     * List all packages on a device
      * @param builder use this to build options for package manager. This param cannot be null
      * @param serial optional param to specify serial of the device on which to execute command
      * @return List of packages
@@ -139,9 +158,21 @@ public class PMController
     }
 
     /**
+     * Install apk to a device<br>
+     * Unlike {@link JDroidLib.android.controllers.ADBController#installApplication(boolean, String, String)}
+     * apk file must be located on a device to install<br>
+     * @param builder use this to build options for package manager. This param cannot be null
+     */
+    public String installPackage(PMInstallPackageBuilder builder) throws IOException
+    {
+        return installPackage(builder, null);
+    }
+
+    /**
      * Uninstall application<br>
      * @param keepData keep the data and cache directories around after package removal.
      * @param serial optional param to specify serial of the device on which to execute command
+     * @param packageName package name of the application to uninstall (eg. com.example.app)
      */
     public String uninstallPackage(boolean keepData, String serial, String packageName) throws IOException
     {
@@ -156,5 +187,24 @@ public class PMController
             sb.append(line).append("\n");
         }
         return sb.toString();
+    }
+
+    /**
+     * Uninstall application<br>
+     * @param serial optional param to specify serial of the device on which to execute command
+     * @param packageName package name of the application to uninstall (eg. com.example.app)
+     */
+    public String uninstallPackage(String serial, String packageName) throws IOException
+    {
+        return uninstallPackage(false, serial, packageName);
+    }
+
+    /**
+     * Uninstall application<br>
+     * @param packageName package name of the application to uninstall (eg. com.example.app)
+     */
+    public String uninstallPackage(String packageName) throws IOException
+    {
+        return uninstallPackage(false, null, packageName);
     }
 }
