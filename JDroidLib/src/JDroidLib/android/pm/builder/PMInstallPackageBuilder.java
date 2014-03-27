@@ -5,11 +5,13 @@ package JDroidLib.android.pm.builder;
  */
 public class PMInstallPackageBuilder extends PMBuilder
 {
+    // package/apk/file to install must be set last
+    // this is used to check if we already specified package and ignore all other calls if so
     private boolean packageSet = false;
 
     public PMInstallPackageBuilder()
     {
-        builder = new StringBuilder("pm install");
+        builder.append(" install");
     }
 
     /**
@@ -87,6 +89,7 @@ public class PMInstallPackageBuilder extends PMBuilder
 
     /**
      * path to a file on a device to be installed
+     * this method must be called last, all other calls in this class will be ignored after calling this method
      * */
     public PMInstallPackageBuilder setFile(String fileName)
     {
@@ -94,7 +97,8 @@ public class PMInstallPackageBuilder extends PMBuilder
         {
             return this;
         }
-        builder.append(fileName);
+        builder.append(" ").append(fileName);
+        packageSet = true;
         return this;
     }
 }

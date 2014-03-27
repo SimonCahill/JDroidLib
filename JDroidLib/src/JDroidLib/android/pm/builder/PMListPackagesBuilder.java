@@ -5,6 +5,8 @@ package JDroidLib.android.pm.builder;
  */
 public class PMListPackagesBuilder extends PMBuilder
 {
+    // filter must be set last
+    // this is used to check if we already specified filter and ignore all other calls if so
     private boolean filterSet = false;
 
     /**
@@ -13,7 +15,7 @@ public class PMListPackagesBuilder extends PMBuilder
      * */
     public PMListPackagesBuilder()
     {
-        builder = new StringBuilder("pm list packages");
+        builder.append(" list packages");
     }
 
     /**
@@ -92,6 +94,7 @@ public class PMListPackagesBuilder extends PMBuilder
     /**
      * Specify filter that will list only matching packages<br>
      * You can use regular expression. eg. "com.android.*"
+     * this method must be called last, all other calls in this class will be ignored after calling this method
      * */
     public PMListPackagesBuilder setFilter(String filter)
     {

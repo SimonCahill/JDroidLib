@@ -5,7 +5,7 @@ package JDroidLib.android.pm.builder;
  */
 public class PMBuilder
 {
-    protected StringBuilder builder;
+    protected StringBuilder builder = new StringBuilder("pm");
 
     @Override
     public String toString()

@@ -41,16 +41,19 @@ public class PMController
     /**
      * Get help/usage for <b>pm</b> as String
      * */
-    public String getHelp()
+    public String getUsage()
     {
         InputStream input = this.getClass().getResourceAsStream("/JDroidLib/res/help/pm_help");
-        try
+        if (help == null)
         {
-            help = ResourceManager.readStreamToString(input);
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace();
+            try
+            {
+                help = ResourceManager.readStreamToString(input);
+            }
+            catch (IOException e)
+            {
+                e.printStackTrace();
+            }
         }
         return help;
     }
@@ -60,7 +63,7 @@ public class PMController
      * */
     public void printHelp()
     {
-        System.out.println(getHelp());
+        System.out.println(getUsage());
     }
 
     /**
