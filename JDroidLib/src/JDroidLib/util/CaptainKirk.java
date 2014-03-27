@@ -131,7 +131,7 @@ public class CaptainKirk {
         if (shell) {
             args.add("shell");
         }
-        args.addAll(Arrays.asList(commands));
+        if(commands != null)args.addAll(Arrays.asList(commands));
         process.command(args);
         pr = process.start();
         processReader = new BufferedReader(new InputStreamReader(pr.getInputStream()));
