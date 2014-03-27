@@ -207,4 +207,45 @@ public class PMController
     {
         return uninstallPackage(false, null, packageName);
     }
+
+    /**
+     * deletes all data associated with a package.<br>
+     * @param userId optional. Id of the user for which to clear data
+     * @param serial optional param to specify serial of the device on which to execute command
+     * @param packageName package name of the application to uninstall (eg. com.example.app)
+     */
+    public String clearData(String packageName, String serial, String userId) throws IOException
+    {
+        boolean userIdValid = userId != null && !userId.isEmpty();
+        String[] cmd = {"pm", "clear", userIdValid ? "--user" : "", userIdValid ? userId : "", packageName};
+
+        StringBuilder sb = new StringBuilder();
+        String raw = controller.executeADBCommand(true, false, serial, cmd);
+        BufferedReader reader = new BufferedReader(new StringReader(raw));
+        String line;
+        while ((line = reader.readLine()) != null)
+        {
+            sb.append(line).append("\n");
+        }
+        return sb.toString();
+    }
+
+    /**
+     * deletes all data associated with a package.<br>
+     * @param serial optional param to specify serial of the device on which to execute command
+     * @param packageName package name of the application to uninstall (eg. com.example.app)
+     */
+    public String clearData(String packageName, String serial) throws IOException
+    {
+        return clearData(packageName, serial, null);
+    }
+
+    /**
+     * deletes all data associated with a package.<br>
+     * @param packageName package name of the application to uninstall (eg. com.example.app)
+     */
+    public String clearData(String packageName) throws IOException
+    {
+        return clearData(packageName, null, null);
+    }
 }
