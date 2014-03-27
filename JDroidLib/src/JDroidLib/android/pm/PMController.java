@@ -174,9 +174,9 @@ public class PMController
      * @param serial optional param to specify serial of the device on which to execute command
      * @param packageName package name of the application to uninstall (eg. com.example.app)
      */
-    public String uninstallPackage(boolean keepData, String serial, String packageName) throws IOException
+    public String uninstallPackage(boolean runAsRoot, boolean keepData, String serial, String packageName) throws IOException
     {
-        String[] cmd = {"pm", "uninstall", keepData ? "-k" : "", packageName};
+        String[] cmd = {runAsRoot ? "su -c " : "", "pm", "uninstall", keepData ? "-k" : "", packageName};
 
         StringBuilder sb = new StringBuilder();
         String raw = controller.executeADBCommand(true, false, serial, cmd);
@@ -196,7 +196,17 @@ public class PMController
      */
     public String uninstallPackage(String serial, String packageName) throws IOException
     {
-        return uninstallPackage(false, serial, packageName);
+        return uninstallPackage(false, false, serial, packageName);
+    }
+
+    /**
+     * Uninstall application<br>
+     * @param serial optional param to specify serial of the device on which to execute command
+     * @param packageName package name of the application to uninstall (eg. com.example.app)
+     */
+    public String uninstallPackage(boolean runAsRoot, String serial, String packageName) throws IOException
+    {
+        return uninstallPackage(runAsRoot, false, serial, packageName);
     }
 
     /**
@@ -214,10 +224,10 @@ public class PMController
      * @param serial optional param to specify serial of the device on which to execute command
      * @param packageName package name of the application to uninstall (eg. com.example.app)
      */
-    public String clearData(String packageName, String serial, String userId) throws IOException
+    public String clearData(String packageName, String serial, String userId, boolean runAsRoot) throws IOException
     {
         boolean userIdValid = userId != null && !userId.isEmpty();
-        String[] cmd = {"pm", "clear", userIdValid ? "--user" : "", userIdValid ? userId : "", packageName};
+        String[] cmd = {runAsRoot ? "su -c " : "", "pm", "clear", userIdValid ? "--user" : "", userIdValid ? userId : "", packageName};
 
         StringBuilder sb = new StringBuilder();
         String raw = controller.executeADBCommand(true, false, serial, cmd);
@@ -237,7 +247,17 @@ public class PMController
      */
     public String clearData(String packageName, String serial) throws IOException
     {
-        return clearData(packageName, serial, null);
+        return clearData(packageName, serial, null, false);
+    }
+
+    /**
+     * deletes all data associated with a package.<br>
+     * @param serial optional param to specify serial of the device on which to execute command
+     * @param packageName package name of the application to uninstall (eg. com.example.app)
+     */
+    public String clearData(String packageName, String serial, boolean runAsRoot) throws IOException
+    {
+        return clearData(packageName, serial, null, runAsRoot);
     }
 
     /**
@@ -246,6 +266,16 @@ public class PMController
      */
     public String clearData(String packageName) throws IOException
     {
-        return clearData(packageName, null, null);
+        return clearData(packageName, null, null, false);
+    }
+
+
+    /**
+     * deletes all data associated with a package.<br>
+     * @param packageName package name of the application to uninstall (eg. com.example.app)
+     */
+    public String clearData(String packageName, boolean runAsRoot) throws IOException
+    {
+        return clearData(packageName, null, null, runAsRoot);
     }
 }
