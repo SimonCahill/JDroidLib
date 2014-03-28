@@ -19,19 +19,12 @@ package JDroidLib.util;
 
 import net.lingala.zip4j.exception.ZipException;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.io.*;
+import java.util.*;
 
 import JDroidLib.android.controllers.ADBController;
 import JDroidLib.android.device.Device;
-import JDroidLib.enums.OS;
-import JDroidLib.enums.RebootTo;
+import JDroidLib.enums.*;
 
 /**
  * This is Captain Kirk! Say hello! He will be our commander and captain,
@@ -49,9 +42,14 @@ public class CaptainKirk {
 
     /**
      * Default constructor: Installs ADB/fastboot and gets other data.
-     * @throws IOException if something happens while extracting the files to the hard drive...
-     * @throws ZipException if something happens while un-zipping the extracted files...
-     * @throws InterruptedException if the thread's sleep(s) get interrupted. Don't ask why it needs to sleep. Let's just say it'll get cranky if it doesn't.
+     *
+     * @throws IOException if something happens while extracting the files to
+     * the hard drive...
+     * @throws ZipException if something happens while un-zipping the extracted
+     * files...
+     * @throws InterruptedException if the thread's sleep(s) get interrupted.
+     * Don't ask why it needs to sleep. Let's just say it'll get cranky if it
+     * doesn't.
      */
     public CaptainKirk() throws IOException, ZipException, InterruptedException {
         resMan = new ResourceManager();
@@ -131,7 +129,9 @@ public class CaptainKirk {
         if (shell) {
             args.add("shell");
         }
-        if(commands != null)args.addAll(Arrays.asList(commands));
+        if (commands != null) {
+            args.addAll(Arrays.asList(commands));
+        }
         process.command(args);
         pr = process.start();
         processReader = new BufferedReader(new InputStreamReader(pr.getInputStream()));
@@ -313,7 +313,7 @@ public class CaptainKirk {
             if (line.startsWith("List ")) {
                 continue;
             }
-            if(line.trim().isEmpty())//ignore empty lines
+            if (line.trim().isEmpty())//ignore empty lines
             {
                 continue;
             }
@@ -348,9 +348,11 @@ public class CaptainKirk {
         }
         return devs;
     }
-    
+
     /**
-     * Restarts the ADB deamon as a root user, and allows for more administrative functions to work.
+     * Restarts the ADB deamon as a root user, and allows for more
+     * administrative functions to work.
+     *
      * @param serial of the device to root.
      * @return the ADB output.
      * @throws IOException if something went wrong.
@@ -358,7 +360,6 @@ public class CaptainKirk {
     public String restartADBAsRoot(String serial) throws IOException {
         return executeADBCommand(false, false, serial, new String[]{"root"});
     }
-    
 
 }
 
