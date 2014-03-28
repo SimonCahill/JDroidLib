@@ -41,16 +41,19 @@ public class PMController
     /**
      * Get help/usage for <b>pm</b> as String
      * */
-    public String getHelp()
+    public String getUsage()
     {
         InputStream input = this.getClass().getResourceAsStream("/JDroidLib/res/help/pm_help");
-        try
+        if (help == null)
         {
-            help = ResourceManager.readStreamToString(input);
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace();
+            try
+            {
+                help = ResourceManager.readStreamToString(input);
+            }
+            catch (IOException e)
+            {
+                e.printStackTrace();
+            }
         }
         return help;
     }
@@ -60,7 +63,7 @@ public class PMController
      * */
     public void printHelp()
     {
-        System.out.println(getHelp());
+        System.out.println(getUsage());
     }
 
     /**
@@ -73,6 +76,25 @@ public class PMController
     {
         String[] commands = builder.toString().split(" ");
         return controller.executeADBCommand(true, false, serial, commands);
+    }
+
+    /**
+     * List all packages on a device
+     * @return List of packages
+     * */
+    public List<Package> listPackages() throws IOException
+    {
+        return listPackages(new PMListPackagesBuilder(), null);
+    }
+
+    /**
+     * List all packages on a device
+     * @param serial optional param to specify serial of the device on which to execute command
+     * @return List of packages
+     * */
+    public List<Package> listPackages(String serial) throws IOException
+    {
+        return listPackages(new PMListPackagesBuilder(), serial);
     }
 
     /**
@@ -133,5 +155,127 @@ public class PMController
             sb.append(line).append("\n");
         }
         return sb.toString();
+    }
+
+    /**
+     * Install apk to a device<br>
+     * Unlike {@link JDroidLib.android.controllers.ADBController#installApplication(boolean, String, String)}
+     * apk file must be located on a device to install<br>
+     * @param builder use this to build options for package manager. This param cannot be null
+     */
+    public String installPackage(PMInstallPackageBuilder builder) throws IOException
+    {
+        return installPackage(builder, null);
+    }
+
+    /**
+     * Uninstall application<br>
+     * @param keepData keep the data and cache directories around after package removal.
+     * @param serial optional param to specify serial of the device on which to execute command
+     * @param packageName package name of the application to uninstall (eg. com.example.app)
+     */
+    public String uninstallPackage(boolean runAsRoot, boolean keepData, String serial, String packageName) throws IOException
+    {
+        String[] cmd = {runAsRoot ? "su -c " : "", "pm", "uninstall", keepData ? "-k" : "", packageName};
+
+        StringBuilder sb = new StringBuilder();
+        String raw = controller.executeADBCommand(true, false, serial, cmd);
+        BufferedReader reader = new BufferedReader(new StringReader(raw));
+        String line;
+        while ((line = reader.readLine()) != null)
+        {
+            sb.append(line).append("\n");
+        }
+        return sb.toString();
+    }
+
+    /**
+     * Uninstall application<br>
+     * @param serial optional param to specify serial of the device on which to execute command
+     * @param packageName package name of the application to uninstall (eg. com.example.app)
+     */
+    public String uninstallPackage(String serial, String packageName) throws IOException
+    {
+        return uninstallPackage(false, false, serial, packageName);
+    }
+
+    /**
+     * Uninstall application<br>
+     * @param serial optional param to specify serial of the device on which to execute command
+     * @param packageName package name of the application to uninstall (eg. com.example.app)
+     */
+    public String uninstallPackage(boolean runAsRoot, String serial, String packageName) throws IOException
+    {
+        return uninstallPackage(runAsRoot, false, serial, packageName);
+    }
+
+    /**
+     * Uninstall application<br>
+     * @param packageName package name of the application to uninstall (eg. com.example.app)
+     */
+    public String uninstallPackage(String packageName) throws IOException
+    {
+        return uninstallPackage(false, null, packageName);
+    }
+
+    /**
+     * deletes all data associated with a package.<br>
+     * @param userId optional. Id of the user for which to clear data
+     * @param serial optional param to specify serial of the device on which to execute command
+     * @param packageName package name of the application to uninstall (eg. com.example.app)
+     */
+    public String clearData(String packageName, String serial, String userId, boolean runAsRoot) throws IOException
+    {
+        boolean userIdValid = userId != null && !userId.isEmpty();
+        String[] cmd = {runAsRoot ? "su -c " : "", "pm", "clear", userIdValid ? "--user" : "", userIdValid ? userId : "", packageName};
+
+        StringBuilder sb = new StringBuilder();
+        String raw = controller.executeADBCommand(true, false, serial, cmd);
+        BufferedReader reader = new BufferedReader(new StringReader(raw));
+        String line;
+        while ((line = reader.readLine()) != null)
+        {
+            sb.append(line).append("\n");
+        }
+        return sb.toString();
+    }
+
+    /**
+     * deletes all data associated with a package.<br>
+     * @param serial optional param to specify serial of the device on which to execute command
+     * @param packageName package name of the application to uninstall (eg. com.example.app)
+     */
+    public String clearData(String packageName, String serial) throws IOException
+    {
+        return clearData(packageName, serial, null, false);
+    }
+
+    /**
+     * deletes all data associated with a package.<br>
+     * @param serial optional param to specify serial of the device on which to execute command
+     * @param packageName package name of the application to uninstall (eg. com.example.app)
+     */
+    public String clearData(String packageName, String serial, boolean runAsRoot) throws IOException
+    {
+        return clearData(packageName, serial, null, runAsRoot);
+    }
+
+    /**
+     * deletes all data associated with a package.<br>
+     * @param packageName package name of the application to uninstall (eg. com.example.app)
+     */
+    public String clearData(String packageName) throws IOException
+    {
+        return clearData(packageName, null, null, false);
+    }
+
+
+    /**
+     * deletes all data associated with a package.<br>
+     * @param packageName package name of the application to uninstall (eg. com.example.app)
+     */
+    public String clearData(String packageName, boolean runAsRoot) throws IOException
+    {
+        return clearData(packageName, null, null, runAsRoot);
     }
 }
