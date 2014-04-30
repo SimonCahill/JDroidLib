@@ -22,6 +22,7 @@ import JDroidLib.enums.RebootTo;
 import JDroidLib.util.CaptainKirk;
 
 import java.io.*;
+import java.util.*;
 
 import net.lingala.zip4j.exception.ZipException;
 
@@ -87,6 +88,15 @@ public class FastbootController {
      */
     public String rebootDeviceFastboot(String deviceSerial, RebootTo mode) throws IOException {
         return controller.fastboot_rebootDevice(deviceSerial, mode);
+    }
+    
+    /**
+     * Retrieves a list of all connected devices currently running in fastboot-mode.
+     * @return A list containing String data types, each item representing one device. 
+     * @throws IOException If something goes wrong.
+     */
+    public List<String> getConnectedDevices() throws IOException {
+        return controller.getConnectedFastbootDevices();
     }
 
 }

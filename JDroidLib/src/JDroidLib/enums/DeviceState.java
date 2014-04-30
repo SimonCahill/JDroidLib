@@ -16,38 +16,43 @@
  * MA 02110-1301  USA
  */
 
+
 package JDroidLib.enums;
+
 
 /**
  *
- * @author beatsleigher
+ * @author beatsleigher, someone else whom I don't know of...
  */
 public enum DeviceState {
-    DEVICE, OFFLINE, RECOVERY, FASTBOOT, UNKNOWN, BOOTLOADER ,HOST, SIDELOAD, NOPERM, UNAUTHORIZED;
+
+    DEVICE, OFFLINE, RECOVERY, FASTBOOT, UNKNOWN, BOOTLOADER, HOST, SIDELOAD, NOPERM, UNAUTHORIZED;
 
     //this is taken from "transport.c" from adb source ("https://github.com/android/platform_system_core/blob/master/adb/transport.c")
 
     /*switch(t->connection_state){
-    case CS_OFFLINE: return "offline";
-    case CS_BOOTLOADER: return "bootloader";
-    case CS_DEVICE: return "device";
-    case CS_HOST: return "host";
-    case CS_RECOVERY: return "recovery";
-    case CS_SIDELOAD: return "sideload";
-    case CS_NOPERM: return "no permissions";
-    case CS_UNAUTHORIZED: return "unauthorized";
-    default: return "unknown";
-    }*/
-
+     case CS_OFFLINE: return "offline";
+     case CS_BOOTLOADER: return "bootloader";
+     case CS_DEVICE: return "device";
+     case CS_HOST: return "host";
+     case CS_RECOVERY: return "recovery";
+     case CS_SIDELOAD: return "sideload";
+     case CS_NOPERM: return "no permissions";
+     case CS_UNAUTHORIZED: return "unauthorized";
+     default: return "unknown";
+     }*/
+    
     /**
      * Convert device state from string to one of the enum constants
+     *
      * @param state state of the device as string
-     * @return state of the device represented as on of the constants from {@link JDroidLib.enums.DeviceState}
-     **/
-    public static DeviceState getState(String state)
-    {
-        switch (state)
-        {
+     *
+     * @return state of the device represented as on of the constants from
+     *         {@link JDroidLib.enums.DeviceState}
+     *
+     */
+    public static DeviceState getState(String state) {
+        switch (state) {
             case "device":
                 return DEVICE;
             case "offline":
@@ -73,12 +78,14 @@ public enum DeviceState {
 
     /**
      * Get human readable representation of the device state
-     * @param state DeviceState constant to be converted to human readable string
-     * @return */
-    public static String getState(DeviceState state)
-    {
-        switch (state)
-        {
+     *
+     * @param state DeviceState constant to be converted to human readable
+     *              string
+     *
+     * @return
+     */
+    public static String getState(DeviceState state) {
+        switch (state) {
             case DEVICE:
                 return "device";
             case OFFLINE:
@@ -101,4 +108,5 @@ public enum DeviceState {
                 return "unknown";
         }
     }
+
 }

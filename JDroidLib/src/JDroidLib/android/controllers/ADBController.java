@@ -48,7 +48,7 @@ public final class ADBController {
     /**
      * Retrieves a list of connected devices.
      *
-     * @return list of devics.
+     * @return list of devices.
      * @throws IOException
      * @author Beatsleigher, pedja1
      * @since beta
@@ -306,6 +306,7 @@ public final class ADBController {
      * @since beta
      *
      */
+    @SuppressWarnings("null")
     public void backupDevice(boolean backupAPKs, boolean backupOBB, boolean backupShared, boolean backupSystem, boolean backupAll, List<String> specificPackages, String deviceSerial, String backupFile)
             throws IOException, DeviceNotFoundException, UnableToConnectForBackupException {
         List<String> args = new ArrayList();
@@ -335,8 +336,8 @@ public final class ADBController {
             args.add("-nosystem");
         }
         if (specificPackages != null || !specificPackages.isEmpty()) {
-            for (int i = 0; i < specificPackages.size(); i++) {
-                args.add(specificPackages.get(i));
+            for (String specificPackage : specificPackages) {
+                args.add(specificPackage);
             }
         }
         String[] cmds = {"backup", Arrays.deepToString(args.toArray())};
@@ -438,5 +439,22 @@ public final class ADBController {
     public void rootServer() throws IOException {
         executeADBCommand(false, false, null, new String[]{"root"});
     }
+    
+    /**
+     * Returns a new instance of a device.
+     * If one other son of a bitch deletes this method, I <i><b>WILL</b></i> go fucking crazy!
+     * @param serial
+     * @return 
+     */
+    public Device getDevice(String serial) {
+        return new Device(serial, this);
+    }
+    
+    /**
+     * Returns the currently in-use ADB file being used by JDroidLib.
+     * This is handy for when you need to do things, which JDroidLib is not capable of.
+     * @return current ADB file.
+     */
+    public File getADB() { return controller.getADB(); }
 
 }

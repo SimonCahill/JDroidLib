@@ -299,6 +299,7 @@ public class CaptainKirk {
     /**
      * Gets a List(String) of devices and their respective states.
      *
+     * @param controller
      * @return devices and device states.
      * @throws IOException if something went wrong.
      */
@@ -360,6 +361,12 @@ public class CaptainKirk {
     public String restartADBAsRoot(String serial) throws IOException {
         return executeADBCommand(false, false, serial, new String[]{"root"});
     }
+    
+    /**
+     * Returns the currently used ADB file.
+     * @return 
+     */
+    public File getADB() { return adb; }
 
 }
 

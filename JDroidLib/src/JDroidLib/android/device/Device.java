@@ -17,7 +17,10 @@
  * MA 02110-1301  USA
  */
 
+
 package JDroidLib.android.device;
+
+
 import JDroidLib.android.controllers.ADBController;
 import JDroidLib.enums.DeviceState;
 
@@ -35,7 +38,7 @@ public class Device {
     private DeviceState state = null;
     private CPU cpu = null;
     private String serial = null;
-    
+
     public Device(String device, ADBController adbController) {
         String[] arr = device.split("\t");
 
@@ -45,32 +48,49 @@ public class Device {
         battery = new Battery(serial, adbController);
         cpu = new CPU(serial, adbController);
         buildProp = new BuildProp(serial, adbController);
-        state = DeviceState.getState(arr[1]);
+        state = DeviceState.valueOf(arr[1]);
     }
-    
+
     /**
      * Gets the devices current state and
+     *
      * @return device state.
      */
     public DeviceState getState() {
         return state;
     }
-    
-    public SU getSU() { return su; }
-    
-    public BusyBox getBusybox() { return busybox; }
-    
-    public Battery getBattery() { return battery; }
-    
-    public CPU getCPU() { return cpu; }
-    
-    public String getSerial() { return serial; }
-    
-    public BuildProp getBuildProp() { return buildProp; }
+
+    public SU getSU() {
+        return su;
+    }
+
+    public BusyBox getBusybox() {
+        return busybox;
+    }
+
+    public Battery getBattery() {
+        return battery;
+    }
+
+    public CPU getCPU() {
+        return cpu;
+    }
+
+    public String getSerial() {
+        return serial;
+    }
+
+    public BuildProp getBuildProp() {
+        return buildProp;
+    }
 
     @Override
-    public String toString()
-    {
-        return String.format("[%s] %s", DeviceState.getState(state), serial);
+    /**
+     * Returns the serial number of the device currently represented by this Device object.
+     * @return (See description)
+     */
+    public String toString() {
+        return serial;
     }
+
 }
