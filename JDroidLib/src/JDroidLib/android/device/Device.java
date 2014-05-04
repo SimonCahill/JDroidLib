@@ -21,7 +21,7 @@
 package JDroidLib.android.device;
 
 
-import JDroidLib.android.controllers.ADBController;
+import JDroidLib.android.controllers.*;
 import JDroidLib.enums.DeviceState;
 
 /**
@@ -38,17 +38,23 @@ public class Device {
     private DeviceState state = null;
     private CPU cpu = null;
     private String serial = null;
+    private ADBController adbController = null;
 
     public Device(String device, ADBController adbController) {
         String[] arr = device.split("\t");
-
+        System.out.println("Device: " + device + ", array length: " + arr.length);
+        
+        this.adbController = adbController;
         this.serial = arr[0];
         su = new SU(serial, adbController);
         busybox = new BusyBox(serial, adbController);
         battery = new Battery(serial, adbController);
         cpu = new CPU(serial, adbController);
         buildProp = new BuildProp(serial, adbController);
-        state = DeviceState.valueOf(arr[1]);
+        if (!(arr.length <= 1))
+            state = DeviceState.getState(arr[1].toLowerCase());
+        else
+            state = DeviceState.getState(device); 
     }
 
     /**
@@ -91,6 +97,10 @@ public class Device {
      */
     public String toString() {
         return serial;
+    }
+    
+    public PackageController getPackageController() {
+        return new PackageController(adbController, this);
     }
 
 }

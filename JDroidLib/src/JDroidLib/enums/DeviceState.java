@@ -52,7 +52,7 @@ public enum DeviceState {
      *
      */
     public static DeviceState getState(String state) {
-        switch (state) {
+        switch (state.toLowerCase()) {
             case "device":
                 return DEVICE;
             case "offline":
@@ -87,25 +87,25 @@ public enum DeviceState {
     public static String getState(DeviceState state) {
         switch (state) {
             case DEVICE:
-                return "device";
+                return "DEVICE";
             case OFFLINE:
-                return "offline";
+                return "OFFLINE";
             case RECOVERY:
-                return "recovery";
+                return "RECOVERY";
             case FASTBOOT:
-                return "fastboot";
+                return "FASTBOOT";
             case BOOTLOADER:
-                return "bootloader";
+                return "BOOTLOADER";
             case HOST:
-                return "host";
+                return "HOST";
             case SIDELOAD:
-                return "sideload";
+                return "SIDELOAD";
             case NOPERM:
-                return "no permissions";
+                return "NO PERMISSIONS";
             case UNAUTHORIZED:
-                return "unauthorized";
+                return "UNAUTHORIZED";
             default:
-                return "unknown";
+                return "UNKNOWN";
         }
     }
 
