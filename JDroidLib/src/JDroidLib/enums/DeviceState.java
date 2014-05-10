@@ -108,5 +108,6 @@ public enum DeviceState {
                 return "UNKNOWN";
         }
     }
+    
 
 }

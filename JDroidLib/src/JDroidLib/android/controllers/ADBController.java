@@ -71,7 +71,7 @@ public final class ADBController {
      *
      */
     public void startServer() throws IOException {
-        controller.executeADBCommand(false, false, null, new String[]{"start-server"});
+        controller.executeADBCommand(false, false, "", new String[]{"start-server"});
     }
 
     /**
@@ -83,7 +83,7 @@ public final class ADBController {
      *
      */
     public void stopServer() throws IOException {
-        controller.executeADBCommand(false, false, null, new String[]{"stop-server"});
+        controller.executeADBCommand(false, false, "", new String[]{"stop-server"});
     }
 
     /**
@@ -194,6 +194,24 @@ public final class ADBController {
      */
     public String executeADBCommand(boolean asShell, boolean remountDevice, Device serial, List<String> cmds) throws IOException, NullPointerException {
         return controller.executeADBCommand(asShell, remountDevice, serial, cmds);
+    }
+    
+    /**
+     * Allows execution of custom ADB commands, used for data capsuling, so
+     * brainy Brian don't get too much attention. He got ADHD. Poor fella.
+     *
+     * @param asShell Execute as shell command.
+     * @param remountDevice Self explanatory...
+     * @param device The device to issue the command to.
+     * @param cmds you want to execute.
+     * @return ADB output.
+     * @throws IOException if something went wrong.
+     * @author Beatsleigher
+     * @since beta
+     *
+     */
+    public String executeADBCommand(boolean asShell, boolean remountDevice, Device device, String[] cmds) throws IOException, NullPointerException {
+        return controller.executeADBCommand(asShell, remountDevice, device, cmds);
     }
 
     /**
@@ -457,7 +475,7 @@ public final class ADBController {
      * @throws IOException
      */
     public void rootServer() throws IOException {
-        executeADBCommand(false, false, null, new String[]{"root"});
+        executeADBCommand(false, false, "", new String[]{"root"});
     }
     
     /**

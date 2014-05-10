@@ -23,6 +23,7 @@ package JDroidLib.android.device;
 
 import JDroidLib.android.controllers.*;
 import JDroidLib.enums.DeviceState;
+import JDroidLib.exceptions.*;
 import java.io.*;
 import java.util.*;
 
@@ -135,6 +136,26 @@ public class Device {
                 return true;
         }
         return false;
+    }
+    
+    /**
+     * Reboots the device into the specified device state (Choose between: RECOVERY, FASTBOOT, DEVICE), basically.
+     * @param stateToBootInto The state to which the device should be rebooted into...
+     * @throws IOException If something goes wrong... Shouldn't happen. TOOOTALLY confident about that :)
+     * @throws JDroidLib.exceptions.InvalidModeException If the requested reboot is not available
+     * 
+     */
+    public void reboot(DeviceState stateToBootInto) throws IOException, InvalidModeException {
+        if (stateToBootInto == null)
+            throw new NullPointerException("Invalid parameter: stateToBooInto must not be null!");
+        
+        if (stateToBootInto == DeviceState.BOOTLOADER || stateToBootInto == DeviceState.FASTBOOT || stateToBootInto == DeviceState.RECOVERY || stateToBootInto == DeviceState.DEVICE) {
+            if (stateToBootInto == DeviceState.DEVICE) {
+                adbController.executeADBCommand(false, false, this, new String[]{"reboot"});
+                return;
+            }
+            adbController.executeADBCommand(false, false, this, new String[]{"reboot", DeviceState.getState(stateToBootInto)});
+        } else throw new InvalidModeException("The requested reboot-mode is not vald. Requested mode: " + stateToBootInto);
     }
 
 }

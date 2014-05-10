@@ -208,6 +208,42 @@ public class CaptainKirk {
         else return str.toString();
     }
     
+    public String executeADBCommand(boolean asShell, boolean remount, Device device, String[] commands) throws IOException, NullPointerException {
+        //# =============== Variables =============== #\\
+        StringBuilder str = new StringBuilder();
+        ProcessBuilder process = new ProcessBuilder();
+        Process pr = null;
+        BufferedReader reader = null;
+        String line = null;
+        List<String> args = new ArrayList<>();
+        
+        if (device == null)
+            throw new NullPointerException("Device object not set to the instance of an object.");
+        if (commands.length == 0)
+            throw new NullPointerException("No commands/arguments were issued.");
+        
+        if (remount)
+            remountDevice(device);
+        
+        args.add(adb.getAbsolutePath());
+        args.add("-s");
+        args.add(device.toString());
+        if (asShell)
+            args.add("shell");
+        args.addAll(Arrays.asList(commands));
+        
+        //# =============== Execute Commands =============== #\\
+        process.command(args);
+        process.redirectErrorStream(true);
+        pr = process.start();
+        reader = new BufferedReader(new InputStreamReader(pr.getInputStream()));
+        while ((line = reader.readLine()) != null)
+            str.append(line + "\n");
+        if (str.toString().trim().equals(""))
+            return null;
+        else return str.toString();
+    }
+    
     /**
      * Remounts a given device.
      * @param device The device to remount
@@ -386,7 +422,7 @@ public class CaptainKirk {
         List<Device> devices = new ArrayList<>();
         String[] cmd = {"devices"};
 
-        String raw = executeADBCommand(false, false, null, cmd);
+        String raw = executeADBCommand(false, false, "", cmd);
         BufferedReader reader = new BufferedReader(new StringReader(raw));
         String line = "";
         while ((line = reader.readLine()) != null) {
