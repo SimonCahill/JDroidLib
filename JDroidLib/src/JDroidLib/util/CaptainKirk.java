@@ -393,8 +393,7 @@ public class CaptainKirk {
             if (line.startsWith("List ")) {
                 continue;
             }
-            if (line.trim().isEmpty())//ignore empty lines
-            {
+            if (line.trim().isEmpty())/*Ignore empty lines*/ {
                 continue;
             }
             Device device = new Device(line, controller);

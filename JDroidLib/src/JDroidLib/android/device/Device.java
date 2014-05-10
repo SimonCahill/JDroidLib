@@ -65,12 +65,17 @@ public class Device {
      * @throws IOException If something goes wrong (which shouldn't happen, really)
      */
     public DeviceState getState() throws IOException {
-        for (Device dev : adbController.getConnectedDevices()) {
-            if (dev.toString().contains(toString())) {
-                String[] arr = dev.toString().split("\t");
-                this.state = DeviceState.valueOf(arr[1]);
+        state = DeviceState.UNKNOWN;
+        String output = adbController.executeADBCommand(false, false, serial, new String[]{"devices"});
+        BufferedReader reader = new BufferedReader(new StringReader(output));
+        String line = "";
+        while ((line = reader.readLine()) != null)
+            if (line.contains(serial)) {
+                String[] arr = line.split("\t");
+                if (arr.length != 0)
+                    state = DeviceState.valueOf(arr[1]);
             }
-        }
+        
         return state;
     }
 
