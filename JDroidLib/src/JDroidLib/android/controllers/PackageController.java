@@ -211,7 +211,7 @@ public class PackageController {
      * @throws IOException If something goes wrong.
      */
     public String installApplication
-        (boolean forwardLock, boolean reinstall, boolean allowTestApps, File APK, boolean installToSDCard, boolean installToInternalFlash, boolean allowDowngrade) throws IOException {
+        (boolean forwardLock, boolean reinstall, boolean allowTestApps, String APK, boolean installToSDCard, boolean installToInternalFlash, boolean allowDowngrade) throws IOException {
             List<String> args = new ArrayList<>();
             args.add("pm");
             args.add("install");
@@ -222,18 +222,15 @@ public class PackageController {
             if (allowTestApps)
                 args.add("-t");
             args.add("-i");
-            args.add(APK.getAbsolutePath());
+            args.add(APK);
             if (installToSDCard)
                 args.add("-s");
             if (installToInternalFlash)
                 args.add("-f");
             if (allowDowngrade)
                 args.add("-d");
-            String[] _args = new String[10];
-            for (int i = 0; i < args.size(); i++)
-                _args[i] = args.get(i);
                 
-            return adbController.executeADBCommand(true, false, device.toString(), _args);
+            return adbController.executeADBCommand(true, false, device, args);
         }
         
     /**
@@ -386,6 +383,22 @@ public class PackageController {
         String output = adbController.executeADBCommand(true, false, device.toString(), new String[]{"pm", "get-max-users"});
         String[] maxAmount = output.split(": ");
         return Long.valueOf(maxAmount[1]);
+    }
+    
+    /**
+     * Gets a list of all installed packages from the device.
+     * @return A list of all installed packages.
+     * @throws IOException If something goes wrong.
+     */
+    public List<String> getPackages() throws IOException {
+        String output = adbController.executeADBCommand(true, false, device.toString(), new String[]{"pm", "list", "packages"});
+        String[] packages = output.split("\n");
+        List<String> packageList = new ArrayList<>();
+        
+        for (String str : packages)
+            packageList.add(str);
+        
+        return packageList;
     }
     
 }

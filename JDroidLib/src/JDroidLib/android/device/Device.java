@@ -23,6 +23,8 @@ package JDroidLib.android.device;
 
 import JDroidLib.android.controllers.*;
 import JDroidLib.enums.DeviceState;
+import java.io.*;
+import java.util.*;
 
 /**
  *
@@ -58,11 +60,17 @@ public class Device {
     }
 
     /**
-     * Gets the devices current state and
-     *
-     * @return device state.
+     * Refreshes the device's current state.
+     * @return Returns the device's current state (after the state was refreshed)
+     * @throws IOException If something goes wrong (which shouldn't happen, really)
      */
-    public DeviceState getState() {
+    public DeviceState getState() throws IOException {
+        for (Device dev : adbController.getConnectedDevices()) {
+            if (dev.toString().contains(toString())) {
+                String[] arr = dev.toString().split("\t");
+                this.state = DeviceState.valueOf(arr[1]);
+            }
+        }
         return state;
     }
 
@@ -101,6 +109,27 @@ public class Device {
     
     public PackageController getPackageController() {
         return new PackageController(adbController, this);
+    }
+    
+    /**
+     * Installs an application to this device (the device represented by this object)
+     * @param apk The application to install
+     * @return True, if installation was a success, false is otherwise.
+     * @throws IOException If something goes wrong.
+     * @throws NullPointerException ^
+     */
+    public boolean installApplication(String apk) throws IOException, NullPointerException {
+        List<String> args = new ArrayList<>();
+        args.add("install");
+        args.add(apk);
+        String output = adbController.executeADBCommand(false, false, this, args);
+        BufferedReader reader = new BufferedReader(new StringReader(output));
+        String line = null;
+        while ((line = reader.readLine()) != null) {
+            if (line.toLowerCase().contains("success"))
+                return true;
+        }
+        return false;
     }
 
 }

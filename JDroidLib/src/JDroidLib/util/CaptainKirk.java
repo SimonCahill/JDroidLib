@@ -85,7 +85,9 @@ public class CaptainKirk {
      * shell).
      * @return ADB output as String.
      * @throws IOException when something went wrong.
+     * @deprecated It is preferred that the new method is used, however, this method will not be removed, as it is still useful for when only executing a minimal amount of commands.
      */
+    @Deprecated
     public String executeADBCommand(boolean shell, boolean remount, String deviceSerial, String[] commands) throws IOException {
         ///////////////////
         // Variables /////
@@ -113,6 +115,7 @@ public class CaptainKirk {
                 // Wait for remounting to finish.
             }
             pr.destroy();
+            pr = null;
             processReader.close();
             args.clear();
             process = new ProcessBuilder();
@@ -126,12 +129,12 @@ public class CaptainKirk {
             args.add("-s");
             args.add(deviceSerial);
         }
-        if (shell) {
+        if (shell) 
             args.add("shell");
-        }
-        if (commands != null) {
+        
+        if (commands != null) 
             args.addAll(Arrays.asList(commands));
-        }
+        
         process.command(args);
         pr = process.start();
         processReader = new BufferedReader(new InputStreamReader(pr.getInputStream()));
@@ -144,6 +147,82 @@ public class CaptainKirk {
         line = null;
 
         return str.toString();
+    }
+    
+    /**
+     * Executes an ADB command with the provided commands/arguments.
+     * Please note: JDroidLib takes care of the initial arguments, such as the ADB command itself and the <b>specific device</b> command and (if applicable) the <i>shell</i> command..
+     * Please only provide this method with secondary commands, for example: 
+     * <b>EXAMPLE METHOD:</b>
+     * List< String > args = new ArrayList<>();
+     * ADBController adbController = new ADBController();
+     * Device aDevice = adbController.getDevice("a device's serial");
+     * 
+     * args.add("su"); // Initial command is set to su (super user binary)
+     * args.add("-v"); // Secondary command is set to su's -v arg (version)
+     * 
+     * 
+     * adbController.executeADBCommand(true, false, <i>aDevice</i>, args); // Collects all necessary arguments and then issues the command to the specific device.
+     * @param asShell Issue command as a shell command
+     * @param remount Remount the device prior to executing the command
+     * @param device A device object. (The specific device to which to issue the command).
+     * @param command A list of commands/arguments to execute (please do <b>NOT</b> add <i>adb</i> or any direct ADB commands!
+     * @return ADB's output
+     * @throws IOException If something goes wrong when executing the process or reading from the process.
+     * @throws NullPointerException If no device or command is provided.
+     */
+    public String executeADBCommand(boolean asShell, boolean remount, Device device, List<String> command) throws IOException, NullPointerException {
+        //# =============== Variables =============== #\\
+        StringBuilder str = new StringBuilder();
+        ProcessBuilder process = new ProcessBuilder();
+        Process pr = null;
+        BufferedReader reader = null;
+        String line = null;
+        List<String> args = new ArrayList<>();
+        
+        if (device == null)
+            throw new NullPointerException("Device object not set to the instance of an object.");
+        if (command.isEmpty())
+            throw new NullPointerException("No commands/arguments were issued.");
+        
+        if (remount)
+            remountDevice(device);
+        
+        args.add(adb.getAbsolutePath());
+        args.add("-s");
+        args.add(device.toString());
+        if (asShell)
+            args.add("shell");
+        for (String s : command)
+            args.add(s);
+        
+        //# =============== Execute Commands =============== #\\
+        process.command(args);
+        process.redirectErrorStream(true);
+        pr = process.start();
+        reader = new BufferedReader(new InputStreamReader(pr.getInputStream()));
+        while ((line = reader.readLine()) != null)
+            str.append(line + "\n");
+        if (str.toString().trim().equals(""))
+            return null;
+        else return str.toString();
+    }
+    
+    /**
+     * Remounts a given device.
+     * @param device The device to remount
+     * @throws IOException If something goes wrong while executing the process.
+     * @throws NullPointerException If no device is issued.
+     */
+    public void remountDevice(Device device) throws IOException, NullPointerException {
+        
+        if (device == null)
+            throw new NullPointerException("No device object provided");
+        
+        //# =============== Execute Command =============== #\\
+        List<String> args = new ArrayList<>();
+        args.add("remount");
+        executeADBCommand(false, false, device, args);
     }
 
     /**

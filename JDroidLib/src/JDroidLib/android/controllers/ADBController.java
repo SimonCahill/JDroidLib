@@ -170,9 +170,29 @@ public final class ADBController {
      * @throws IOException if something went wrong.
      * @author Beatsleigher
      * @since beta
+     * @deprecated This method is deprecated, and it is recommended, you use the method, which uses a List of String, instead of a String array.
      *
      */
+    @Deprecated
     public String executeADBCommand(boolean asShell, boolean remountDevice, String serial, String[] cmds) throws IOException {
+        return controller.executeADBCommand(asShell, remountDevice, serial, cmds);
+    }
+    
+    /**
+     * Allows execution of custom ADB commands, used for data capsuling, so
+     * brainy Brian don't get too much attention. He got ADHD. Poor fella.
+     *
+     * @param asShell Execute as shell command.
+     * @param remountDevice Self explanatory...
+     * @param serial of the device. (Set to null, if not device specific.)
+     * @param cmds you want to execute.
+     * @return ADB output.
+     * @throws IOException if something went wrong.
+     * @author Beatsleigher
+     * @since beta
+     *
+     */
+    public String executeADBCommand(boolean asShell, boolean remountDevice, Device serial, List<String> cmds) throws IOException, NullPointerException {
         return controller.executeADBCommand(asShell, remountDevice, serial, cmds);
     }
 
