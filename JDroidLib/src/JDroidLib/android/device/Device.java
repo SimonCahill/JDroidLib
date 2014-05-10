@@ -73,7 +73,7 @@ public class Device {
             if (line.contains(serial)) {
                 String[] arr = line.split("\t");
                 if (arr.length != 0)
-                    state = DeviceState.valueOf(arr[1]);
+                    state = DeviceState.valueOf(arr[1].toUpperCase());
             }
         
         return state;
