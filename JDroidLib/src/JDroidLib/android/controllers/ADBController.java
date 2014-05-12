@@ -494,5 +494,12 @@ public final class ADBController {
      * @return current ADB file.
      */
     public File getADB() { return controller.getADB(); }
+    
+    /**
+     * Remounts the device's internal flash memory to R/W, so more advanced operations can be performed.
+     * @param dev The device to remount
+     * @throws IOException If something goes wrong.
+     */
+    public void remountDevice(Device dev) throws IOException { controller.remountDevice(dev);  }
 
 }
