@@ -20,7 +20,8 @@
 package JDroidLib.exceptions;
 
 /**
- *
+ * JDroidLibException.
+ * The @see DeleteFailedException is thrown when the deletion of a file was unsuccessful.
  * @author beatsleigher
  */
 public class DeleteFailedException extends Exception {

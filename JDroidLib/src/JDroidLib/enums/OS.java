@@ -7,7 +7,7 @@
 package JDroidLib.enums;
 
 /**
- *
+ * The operating systems supported by JDroidLib.
  * @author beatsleigher
  */
 public enum OS {

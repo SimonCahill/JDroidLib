@@ -20,7 +20,8 @@
 package JDroidLib.exceptions;
 
 /**
- *
+ * JDroidLib Exception.
+ * Is thrown when a requested property (Build Prop) was not found/doesn't exist.
  * @author beatsleigher
  */
 public class PropertyNotFoundException extends Exception {

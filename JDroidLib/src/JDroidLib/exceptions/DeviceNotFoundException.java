@@ -20,7 +20,7 @@
 package JDroidLib.exceptions;
 
 /**
- * Custom expression used in JDroidLib.
+ * Custom exception used in JDroidLib.
  * This exception is thrown, when a specified device could not be found by the ADB binary.
  * this is usually caused, when a faulty serial number was hard-coded, or when a device was unplugged before an operation begins.
  * @author beatsleigher

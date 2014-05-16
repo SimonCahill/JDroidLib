@@ -7,7 +7,7 @@
 package JDroidLib.enums;
 
 /**
- *
+ * The modes that a device can be booted to.
  * @author beatsleigher
  */
 public enum RebootTo {

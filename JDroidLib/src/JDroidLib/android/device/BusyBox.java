@@ -24,26 +24,31 @@ import JDroidLib.android.controllers.ADBController;
 import java.io.*;
 
 /**
- *
+ * Represents a device's Busybox-installation.
  * @author beatsleigher
  */
 @SuppressWarnings({"FieldMayBeFinal"})
 public class BusyBox {
-    private String serial = "";
+    
+    private final Device device;
     
     private boolean isInstalled = false;
     private String busyboxVersion = "";
     
-    private ADBController adbController = null;
+    private final ADBController adbController;
     
-    public BusyBox(String serial, ADBController adbController) {
-        this.serial = serial;
+    public BusyBox(Device device, ADBController adbController) {
+        this.device = device;
         this.adbController = adbController;
     }
     
+    /**
+     * Updates all the information represented by this class.
+     * @throws IOException If an error occurs while executing ADB commands.
+     */
     private void update() throws IOException {
         String[] cmd = {"busybox"};
-        String raw = adbController.executeADBCommand(true, false, serial, cmd);
+        String raw = adbController.executeADBCommand(true, false, device, cmd);
         BufferedReader reader = new BufferedReader(new StringReader(raw));
         String line = "";
         while ((line = reader.readLine()) != null) {

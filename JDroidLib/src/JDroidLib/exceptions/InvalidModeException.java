@@ -22,7 +22,8 @@ package JDroidLib.exceptions;
 
 
 /**
- *
+ * JDroidLib Exception.
+ * The @see InvalidModeException is thrown, when a user attempts to reboot a device into a mode that is either non-existent or not available.
  * @author beatsleigher
  */
 public class InvalidModeException extends Exception {

@@ -34,26 +34,60 @@ import java.util.*;
 @SuppressWarnings({"FieldMayBeFinal"})
 public class Device {
 
+    /**
+     * Represents the device's SU-installation.
+     * @see SU
+     */
     private SU su = null;
+    /**
+     * Represents the device's busybox-installation.
+     * @see BusyBox
+     */
     private BusyBox busybox = null;
+    /**
+     * Represents the device's battery.
+     * @see Battery
+     */
     private Battery battery = null;
+    /**
+     * Represents the device's build properties.
+     * @see BuildProp
+     */
     private BuildProp buildProp = null;
+    /**
+     * The device's current state. @see DeviceState.
+     */
     private DeviceState state = null;
+    /**
+     * Represents the device's @see CPU
+     */
     private CPU cpu = null;
+    /**
+     * The device's serial.
+     */
     private String serial = null;
+    /**
+     * The @see ADBController instance which powers all the different components here.
+     */
     private ADBController adbController = null;
 
+    /**
+     * Constructor for this @see Device-instance.
+     * Prepares this class for use with <b>one</b> specific device.
+     * @param device The serial number of the device to represent.
+     * @param adbController An instance of ADBController to use in this class (<b>never creates a new instance of @see ADBController</b>)
+     */
     public Device(String device, ADBController adbController) {
         String[] arr = device.split("\t");
         System.out.println("Device: " + device + ", array length: " + arr.length);
         
         this.adbController = adbController;
         this.serial = arr[0];
-        su = new SU(serial, adbController);
-        busybox = new BusyBox(serial, adbController);
-        battery = new Battery(serial, adbController);
-        cpu = new CPU(serial, adbController);
-        buildProp = new BuildProp(serial, adbController);
+        su = new SU(this, adbController);
+        busybox = new BusyBox(this, adbController);
+        battery = new Battery(this, adbController);
+        cpu = new CPU(this, adbController);
+        buildProp = new BuildProp(this, adbController);
         if (!(arr.length <= 1))
             state = DeviceState.getState(arr[1].toLowerCase());
         else
@@ -80,42 +114,55 @@ public class Device {
         return state;
     }
 
-    public SU getSU() {
-        return su;
-    }
+    /**
+     * Returns an instance of @see SU which corresponds to this device.
+     * @return Returns an instance of @see SU, which represents the device's SU-installation
+     */
+    public SU getSU() { return su; }
 
-    public BusyBox getBusybox() {
-        return busybox;
-    }
+    /**
+     * Returns an instance of @see BusyBox.
+     * @return Instance of @see BusyBox, which represents the device's busybox-installation.
+     */
+    public BusyBox getBusybox() { return busybox; }
 
-    public Battery getBattery() {
-        return battery;
-    }
+    /**
+     * Returns an instance of @see Battery.
+     * @return Returns an instance of @see Battery, which represents the device's battery.
+     */
+    public Battery getBattery() { return battery; }
 
-    public CPU getCPU() {
-        return cpu;
-    }
+    /**
+     * Returns an instance of @see CPU
+     * @return Returns an instance of @see CPU, which represents the device's CPU.
+     */
+    public CPU getCPU() { return cpu; }
 
-    public String getSerial() {
-        return serial;
-    }
+    /**
+     * Returns the device's serial-number.
+     * @return Returns the device's serial number as a @see String.
+     */
+    public String getSerial() { return serial; }
 
-    public BuildProp getBuildProp() {
-        return buildProp;
-    }
+    /**
+     * Returns an instance of @see BuildProp.
+     * @return Returns an instance of @see BuildProp, which represents the device's build properties.
+     */
+    public BuildProp getBuildProp() { return buildProp; }
 
-    @Override
+    
     /**
      * Returns the serial number of the device currently represented by this Device object.
      * @return (See description)
      */
-    public String toString() {
-        return serial;
-    }
+    @Override
+    public String toString() { return serial; }
     
-    public PackageController getPackageController() {
-        return new PackageController(adbController, this);
-    }
+    /**
+     * Returns an instance of @see PackageController.
+     * @return Returns an instance of @see PackageController, which represents the device's package manager.
+     */
+    public PackageController getPackageController() { return new PackageController(adbController, this); }
     
     /**
      * Installs an application to this device (the device represented by this object)

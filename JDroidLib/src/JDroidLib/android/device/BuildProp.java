@@ -26,17 +26,22 @@ import JDroidLib.android.controllers.ADBController;
 import java.io.*;
 
 /**
- * This class allows you to easily grab build properties from the Android OS.
+ * This class allows you to easily grab build properties from the Android OS. Represents a device's build properties.
  * @author beatsleigher
  */
 public class BuildProp {
     
-    String serial = "";
-    String propFile = "";
-    ADBController adbController = null;
+    private final Device device;
+    private String propFile = "";
+    private final ADBController adbController;
     
-    public BuildProp(String serial, ADBController adbController) {
-        this.serial = serial;
+    /**
+     * Default constructor for @see BuildProp.
+     * @param device The device this class should represent.
+     * @param adbController The ADBController that makes this thing work.
+     */
+    public BuildProp(Device device, ADBController adbController) {
+        this.device = device;
         this.adbController = adbController;
     }
     
@@ -73,7 +78,7 @@ public class BuildProp {
      * @throws IOException 
      */
     public String getProp() throws IOException {
-        String output = adbController.executeADBCommand(true, false, serial, new String[]{"getprop"});
+        String output = adbController.executeADBCommand(true, false, device, new String[]{"getprop"});
         String toReturn = "";
         BufferedReader reader = new BufferedReader(new StringReader(output));
         String line = "";
@@ -118,9 +123,9 @@ public class BuildProp {
      * @throws IOException if something went wrong.
      */
     public void setProp(String key, String value, boolean rebootAfter) throws IOException {
-        adbController.executeADBCommand(true, false, serial, new String[]{"setprop", key, value});
+        adbController.executeADBCommand(true, false, device, new String[]{"setprop", key, value});
         if (rebootAfter)
-            adbController.rebootDevice(serial, RebootTo.ANDROID);
+            adbController.rebootDevice(device.toString(), RebootTo.ANDROID);
     }
     
     /**
@@ -130,7 +135,7 @@ public class BuildProp {
      */
     public void pullProp(String dest) throws IOException {
         String[] commands = {"pull", "/system/build.prop", dest + "/build.prop"};
-        String str = adbController.executeADBCommand(false, false, serial, commands);
+        String str = adbController.executeADBCommand(false, false, device, commands);
         propFile = dest + "/build.prop";
     }
     
@@ -141,7 +146,7 @@ public class BuildProp {
      */
     public void pushProp(String prop) throws IOException {
         String[] commands = {"push", prop, "/System/"};
-        adbController.executeADBCommand(false, true, serial, commands);
+        adbController.executeADBCommand(false, true, device, commands);
     }
     
 }

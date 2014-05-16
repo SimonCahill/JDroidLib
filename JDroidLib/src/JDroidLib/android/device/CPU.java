@@ -25,19 +25,25 @@ import java.util.*;
 import java.io.*;
 
 /**
- *
+ * Represents a device's CPU (Central Processing Unit) (Its processor, you idiot...)
  * @author beatsleigher
  */
 public class CPU {
     
     private ADBController adbController = null;
     
-    String serial = "";
-    String[] cpuLoad = null;
-    List<String>cpuUsage = null;
+    private final Device device;
+    private String[] cpuLoad = null;
+    private List<String>cpuUsage = null;
     
-    public CPU(String serial, ADBController adbController) {
-        this.serial = serial;
+    /**
+     * Default constructor for @see CPU.
+     * Instantiates this class.
+     * @param device
+     * @param adbController 
+     */
+    public CPU(Device device, ADBController adbController) {
+        this.device = device;
         this.adbController = adbController;
         cpuUsage = new ArrayList();
     }
@@ -48,7 +54,7 @@ public class CPU {
      */
     private void update() throws IOException {
         String[] cmd = {"dumpsys", "cpuinfo"};
-        String raw = adbController.executeADBCommand(true, false, serial, cmd);
+        String raw = adbController.executeADBCommand(true, false, device, cmd);
         BufferedReader reader = new BufferedReader(new StringReader(raw));
         String line = "";
         cpuUsage.clear();
@@ -63,8 +69,18 @@ public class CPU {
         }
     }
     
+    /**
+     * Gets the last known CPU-usage from the device.
+     * @return The last known CPU usage of the device. 
+     * @throws IOException If an error occurs while updating the information.
+     */
     public List<String> getCPUUsage() throws IOException { update(); return cpuUsage;}
     
+    /**
+     * Gets the current CPU load.
+     * @return The current CPU load.
+     * @throws IOException If an error occurs while updating the information.
+     */
     public String[] getCPULoad() throws IOException { update(); return cpuLoad;}
     
 }

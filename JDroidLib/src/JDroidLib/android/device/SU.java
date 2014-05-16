@@ -24,26 +24,35 @@ import JDroidLib.android.controllers.ADBController;
 import java.io.*;
 
 /**
- *
+ * Represents a device's SuperUser installation.
  * @author beatsleigher
  */
 public class SU {
     
-    String serial = "";
-    ADBController adbController = null;
+    private final Device device;
+    private final ADBController adbController;
     
     boolean isInstalled = false;
     boolean hasRoot = false;
     String suVersion = "";
     
-    public SU(String serial, ADBController adbController) {
-        this.serial = serial;
+    /**
+     * The constructor for this class.
+     * @param device The device to represent
+     * @param adbController The @see ADBController which powers everything.
+     */
+    public SU(Device device, ADBController adbController) {
+        this.device = device;
         this.adbController = adbController;
     }
     
+    /**
+     * Updates the information represented by this class.
+     * @throws IOException If an error occurs while executing the ADB commands.
+     */
     private void update() throws IOException {
         String[] cmd = {"su", "-v"};
-        String raw = adbController.executeADBCommand(true, false, serial, cmd);
+        String raw = adbController.executeADBCommand(true, false, device, cmd);
         BufferedReader reader = new BufferedReader(new StringReader(raw));
         String line = "";
         while ((line = reader.readLine()) != null) {

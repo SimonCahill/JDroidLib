@@ -28,12 +28,38 @@ import JDroidLib.exceptions.*;
 import JDroidLib.util.CaptainKirk;
 
 /**
- * JDroidLib class - Contains methods for communicating with an Android device,
- * which is connected to the computer. This class was designed with
- * functionality and speed in mind. There are no useless methods in here, and if
- * so, they were marked @Deprecated and will be removed in the future. These
- * methods are then only kept inside this class to ensure
- * backwards-compatibility.
+ * JDroidLib's main class.
+ * Always create an instance of this class and derive other classes from here.
+ * {@see CaptainKirk} is <u>not</u> meant to be used by anything other than JDroidLib - Only use in emergencies!
+ * 
+ * To "start" JDroidLib, use the following code:
+ * <pre>
+ * {@code
+ * public class YourClass {
+ *      private final ADBController adbController; // Make this final when possible, you're not going to need to change this. <b>ONLY CREATE ONE INSTANCE PER PROGRAM!</b>
+ * 
+ *      public YourClass() {
+ *          try {
+ *              adbController = new ADBController(); // Assign final variable adbController value of new object, type ADBController
+ *          } catch (IOException | ZipException | InterruptedException ex) { // ADBController's constructor throws these exceptions
+ *              System.err.println("Error starting JDroidLib (CODE: BLA)); // You don't have to do this..
+ *              ex.printStackTrace(System.err);
+ *          }
+ *      }
+ * 
+ * }
+ * 
+ * }
+ * </pre>
+ * 
+ * That code initializes JDroidLib and automatically tells JDroidLib to copy any and all needed files to the local hard drive. These are deleted once the JVM exits.
+ * 
+ * To get an instance of FastbootController, use the following code (make sure you have a running instance of ADBController):
+ * <pre>
+ * {@code
+ * private final FastbootController fbController = adbController.getFastbootController(); // Make it final where you can, you won't need to change it.
+ * }
+ * </pre>
  *
  * @author Beatsleigher
  * @since beta
@@ -42,53 +68,43 @@ import JDroidLib.util.CaptainKirk;
 @SuppressWarnings({"MismatchedQueryAndUpdateOfCollection", "UnusedAssignment", "StringConcatenationInsideStringBufferAppend", "ConvertToTryWithResources"})
 public final class ADBController {
 
-    CaptainKirk controller = null;
-    FastbootController fbController = null;
+    private CaptainKirk controller = null;
+    private FastbootController fbController = null;
 
     /**
      * Retrieves a list of connected devices.
      *
-     * @return list of devices.
+     * @return list of Device-instances corresponding to each connected (physical) device.
      * @throws IOException
      * @author Beatsleigher, pedja1
      * @since beta
      *
      */
-    private List<Device> connectedDevices() throws IOException {
-        ////////////////////
-        // Get devices ////
-        //////////////////
-
-        return controller.getConnectedDevices(this);
-    }
+    private List<Device> connectedDevices() throws IOException { return controller.getConnectedDevices(this); }
 
     /**
      * Starts the ADB server on local machine.
-     *
+     * Attempts to start a local ADB deamon on the host machine.
      * @throws IOException
      * @author Beatsleigher
      * @since beta
      *
      */
-    public void startServer() throws IOException {
-        controller.executeADBCommand(false, false, "", new String[]{"start-server"});
-    }
+    public void startServer() throws IOException { controller.executeADBCommand(false, false, "", new String[]{"start-server"}); }
 
     /**
      * Kills the ADB server running on local machine.
-     *
+     * Attempts to stop the local ADB-deamon on the host machine.
      * @throws IOException
      * @author Beatsleigher
      * @since beta
      *
      */
-    public void stopServer() throws IOException {
-        controller.executeADBCommand(false, false, "", new String[]{"stop-server"});
-    }
+    public void stopServer() throws IOException { controller.executeADBCommand(false, false, "", new String[]{"stop-server"}); }
 
     /**
-     * Executes @see #code startServer() and @see #code stopServer().
-     *
+     * Executes @see #startServer() and @see #stopServer().
+     * Attempts to stop the local ADB deamon and then attempts to start a new deamon.
      * @throws IOException
      * @author Beatsleigher
      * @since beta
@@ -101,16 +117,14 @@ public final class ADBController {
 
     /**
      * Returns a list of connected devices via ADB.
-     *
+     * Generates a list of @see Device, where each @see Device instance represents a connected device.
      * @return
      * @throws IOException
      * @author Beatsleigher, pedja1
      * @since beta
      *
      */
-    public List<Device> getConnectedDevices() throws IOException {
-        return connectedDevices();
-    }
+    public List<Device> getConnectedDevices() throws IOException { return connectedDevices(); }
 
     /**
      * Gets a list of all connected fasboot devices (device connected to
@@ -124,17 +138,17 @@ public final class ADBController {
      *
      */
     @Deprecated
-    public List<String> getConnectedFastbootDevices() throws IOException {
-        return controller.getConnectedFastbootDevices();
-    }
+    public List<String> getConnectedFastbootDevices() throws IOException { return controller.getConnectedFastbootDevices(); }
 
     /**
      * Default constructor.
-     *
-     * @throws IOException
-     * @throws ZipException
-     * @throws InterruptedException
-     * @author Beatsleigher
+     * Please use this constructor <b>only</b>. Do <b>not</b> directly invoke @see CaptainKirk!
+     * This constructor creates a new instance of @see CaptainKirk, installs all necessary files and starts the ADB deamon.
+     * 
+     * @throws IOException If a process could not be executed properly.
+     * @throws ZipException If an error occurred while extracting ADB binaries.
+     * @throws InterruptedException If something prevented the thread from correctly sleeping.
+     * @author Beatsleigher That would be my humble self :)
      * @since beta
      *
      */
@@ -146,7 +160,8 @@ public final class ADBController {
 
     /**
      * Disposes of all the class variables uses, to prevent memory leaks.
-     *
+     * Invoke this method, when your application is exiting, so that the garbage collector can clean things up and prevent any memory leaks.
+     * 
      * @throws IOException
      * @author Beatsleigher
      * @since beta
@@ -312,14 +327,12 @@ public final class ADBController {
      * Returns an instance of FastbootController. All methods concerning
      * fastboot in this class are deprecated and will be removed in near future.
      *
-     * @return
+     * @return instance of @see FastbootController
      * @author Beatsleigher
      * @since beta
      *
      */
-    public FastbootController getFastbootController() {
-        return fbController;
-    }
+    public FastbootController getFastbootController() { return fbController; }
 
     /**
      * Attempts to back up selected device.
@@ -474,9 +487,7 @@ public final class ADBController {
      *
      * @throws IOException
      */
-    public void rootServer() throws IOException {
-        executeADBCommand(false, false, "", new String[]{"root"});
-    }
+    public void rootServer() throws IOException { executeADBCommand(false, false, "", new String[]{"root"}); }
     
     /**
      * Returns a new instance of a device.
@@ -484,9 +495,7 @@ public final class ADBController {
      * @param serial
      * @return 
      */
-    public Device getDevice(String serial) {
-        return new Device(serial, this);
-    }
+    public Device getDevice(String serial) { return new Device(serial, this); }
     
     /**
      * Returns the currently in-use ADB file being used by JDroidLib.
