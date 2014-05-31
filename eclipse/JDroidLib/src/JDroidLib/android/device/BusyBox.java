@@ -24,70 +24,59 @@ import JDroidLib.android.controllers.ADBController;
 import java.io.*;
 
 /**
- * Represents a device's SuperUser installation.
+ * Represents a device's Busybox-installation.
  * @author beatsleigher
  */
-public class SU {
+@SuppressWarnings({"FieldMayBeFinal"})
+public class BusyBox {
     
     private final Device device;
+    
+    private boolean isInstalled = false;
+    private String busyboxVersion = "";
+    
     private final ADBController adbController;
     
-    boolean isInstalled = false;
-    boolean hasRoot = false;
-    String suVersion = "";
-    
-    /**
-     * The constructor for this class.
-     * @param device The device to represent
-     * @param adbController The @see ADBController which powers everything.
-     */
-    public SU(Device device, ADBController adbController) {
+    public BusyBox(Device device, ADBController adbController) {
         this.device = device;
         this.adbController = adbController;
     }
     
     /**
-     * Updates the information represented by this class.
-     * @throws IOException If an error occurs while executing the ADB commands.
+     * Updates all the information represented by this class.
+     * @throws IOException If an error occurs while executing ADB commands.
      */
     private void update() throws IOException {
-        String[] cmd = {"su", "-v"};
+        String[] cmd = {"busybox"};
         String raw = adbController.executeADBCommand(true, false, device, cmd);
         BufferedReader reader = new BufferedReader(new StringReader(raw));
         String line = "";
         while ((line = reader.readLine()) != null) {
-            if (line.contains("su: not found")) {
+            if (line.contains("busybox: not found")) {
                 isInstalled = false;
-                hasRoot = false;
-                suVersion = "n/a";
+                busyboxVersion = "n/a";
+                break;
+            } else if (line.startsWith("BusyBox")) {
+                isInstalled = true;
+                String[] arr = line.split("\\ ");
+                busyboxVersion = arr[1];
                 break;
             }
-            isInstalled = true;
-            hasRoot = true;
-            suVersion = line;
         }
         reader.close();
     }
     
     /**
-     * Updates information, and determines whether device is rooted or not.
-     * @return true, if SU is installed. False, if otherwise.
+     * Determines whether BusyBOx is installed or not, and 
+     * @return true if it is installed, false if otherwise.
      * @throws IOException if something went wrong.
      */
-    public boolean isInstalled() throws IOException { update(); return isInstalled; }
+    public boolean isInstalled() throws IOException { update(); return isInstalled;}
     
     /**
-     * Updates information, and determines whether device is rooted or not.
-     * @return true, if device is rooted, false if otherwise.
-     * @throws IOException 
+     * Gets the version of the installed busybox binary and
+     * @return version, if available, or n/a if otherwise.
+     * @throws IOException  if something went wrong.
      */
-    public boolean hasRoot() throws IOException { update(); return hasRoot; }
-    
-    /**
-     * Updates information, and determines whether device is rooted or not.
-     * @return SU version.
-     * @throws IOException 
-     */
-    public String getSUVersion() throws IOException { update(); return suVersion; }
-    
+    public String getVersion() throws IOException { update(); return busyboxVersion; }
 }
