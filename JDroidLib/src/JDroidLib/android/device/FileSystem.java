@@ -68,7 +68,8 @@ public class FileSystem {
             
             BufferedReader reader = new BufferedReader(new StringReader(output));
             while ((line = reader.readLine()) != null) {
-                listOfFiles.add(line);
+                if (!line.equals("") || !line.equals("./"))
+                    listOfFiles.add(line);
             }
             reader.close();
         } else {
