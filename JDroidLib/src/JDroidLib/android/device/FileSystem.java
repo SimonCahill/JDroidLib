@@ -55,6 +55,8 @@ public class FileSystem {
         List<String> listOfFiles = new ArrayList();
         List<String> args = new ArrayList<>();
        
+        adbController.rootServer();
+        
         if (useBusybox && device.getBusybox().isInstalled()) {
             String output = null;
             String line = null;
@@ -63,6 +65,7 @@ public class FileSystem {
             args.add("-a");
             args.add("-p");
             args.add("-1");
+            args.add(location);
             
             output = adbController.executeADBCommand(true, true, device, args);
             
@@ -77,6 +80,7 @@ public class FileSystem {
             String line = null;
             args.add("ls");
             args.add("-a");
+            args.add(location);
             
             output = adbController.executeADBCommand(true, true, device, args);
             
@@ -99,6 +103,84 @@ public class FileSystem {
      */
     public String delete(String file) throws IOException, DeleteFailedException {
         return adbController.executeADBCommand(true, true, device, new String[]{"rm", file});
+    }
+    
+    /**
+     * Creates a new directory in the specified location.
+     * @param location The location of the folder. (Where it should be created).
+     * @param name The name of the folder.
+     * @return ADB's output
+     * @throws IOException If something goes wrong.
+     */
+    public String mkDir(String location, String name) throws IOException {
+        
+        if (location == null || location.equals(""))
+            throw new NullPointerException("No location was specified!");
+        if (name == null || name.equals(""))
+            throw new NullPointerException("No filename was specified!");
+        
+        if (!location.startsWith("/")) {
+            String newLoc = "/" + location;
+            location = newLoc;
+        }
+                    
+        if (!location.endsWith("/") && !name.startsWith("/"))
+            location += "/"; // Check if the path is correct
+        
+        String returnVal = null;
+        String adbOutput = null;
+        
+        adbController.rootServer();
+        
+        try {
+        adbOutput = adbController.executeADBCommand(true, true, device, new String[]{"mkdir", location + name});
+        } finally {
+            if (!adbOutput.equals(""))
+                returnVal = adbOutput;
+            else
+                returnVal = "No output";
+        }
+        
+        return returnVal;
+    }
+    
+    /**
+     * Creates a new file on the device's file system.
+     * @param location The location of the new file.
+     * @param name The name of the new file.
+     * @return ADB's output
+     * @throws IOException If something goes wrong.
+     */
+    public String touch(String location, String name) throws IOException {
+        
+        if (location == null || location.equals(""))
+            throw new NullPointerException("No location was specified!");
+        if (name == null || name.equals(""))
+            throw new NullPointerException("No filename was specified!");
+        
+        if (!location.startsWith("/")) {
+            String newLoc = "/" + location;
+            location = newLoc;
+        }
+        if (!location.endsWith("/") && !name.startsWith("/"))
+            location += "/";
+        
+        String returnVal = null;
+        String adbOutput = null;
+        
+        adbController.rootServer();
+        
+        try {
+            adbOutput = adbController.executeADBCommand(true, true, device, new String[]{"touch", location + name});
+        } finally {
+            if (!adbOutput.equals(""))
+                returnVal = adbOutput;
+            else
+                returnVal = "No output";
+        }
+        
+        return returnVal;
+        
     }
     
 }
