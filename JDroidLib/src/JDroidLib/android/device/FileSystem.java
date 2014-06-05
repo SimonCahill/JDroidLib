@@ -183,4 +183,66 @@ public class FileSystem {
         
     }
     
+    /**
+     * Pulls a file from the device to the local hard drive.
+     * @param source The file to be pull from the device.
+     * @param dest The destination folder.
+     * @return ADB'S output.
+     * @throws IOException 
+     */
+    public String pull(String source, File dest) throws IOException {
+        String returnVal = null;
+        String adbOutput = null;
+        
+        if (source == null || source.equals(""))
+            throw new NullPointerException("Source must not be null!");
+        if (dest == null || dest.getName().equals(""))
+            throw new NullPointerException("Destination must not be null!");
+        if (!dest.isDirectory())
+            throw new IllegalStateException("Destination must be a folder!");
+                
+        adbController.rootServer();
+        
+        try {
+            adbOutput = adbController.executeADBCommand(false, true, device, new String[]{"pull", source, dest.getAbsolutePath()});
+        } finally {
+            if (adbOutput != null || !adbOutput.equals(""))
+                returnVal = adbOutput;
+            else
+                returnVal = "No output";
+        }
+        
+        return returnVal;
+    }
+    
+    /**
+     * Pushes a file to the device's local file system.
+     * @param source The source file/folder to send to device.
+     * @param dest The destination folder on the device.
+     * @return ADB's output.
+     * @throws IOException If something goes wrong.
+     */
+    public String push(File source, String dest) throws IOException {
+        String returnVal = null;
+        String adbOutput = null;
+        
+        if (source == null || source.getName().equals(""))
+            throw new NullPointerException("Source must not be null!");
+        if (dest == null || dest.equals(""))
+            throw new NullPointerException("Destination must not be null!");
+                
+        adbController.rootServer();
+        
+        try {
+            adbOutput = adbController.executeADBCommand(false, true, device, new String[]{"pull", source.getAbsolutePath(), dest});
+        } finally {
+            if (adbOutput != null || !adbOutput.equals(""))
+                returnVal = adbOutput;
+            else
+                returnVal = "No output";
+        }
+        
+        return returnVal;
+    }
+    
 }
