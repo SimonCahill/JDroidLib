@@ -20,8 +20,10 @@
 package JDroidLib.android.device;
 
 import JDroidLib.android.controllers.ADBController;
+import JDroidLib.exceptions.*;
 
 import java.io.*;
+import java.util.*;
 
 /**
  * Represents a device's SuperUser installation.
@@ -89,5 +91,26 @@ public class SU {
      * @throws IOException 
      */
     public String getSUVersion() throws IOException { update(); return suVersion; }
+    
+    /**
+     * Executes a command as the root user on the device associated with this class.
+     * @param remount Remount the device?
+     * @param cmds The command (and arguments) to be executed.
+     * @return ADB's output.
+     * @throws IOException If something goes wrong.
+     * @throws JDroidLib.exceptions.DeviceHasNoRootException if the device does <i>not</i> have root.
+     */
+    public String executeSUCommand(boolean remount, String[] cmds) throws IOException, DeviceHasNoRootException {
+        
+        if (!hasRoot())
+            throw new DeviceHasNoRootException("Cannot execute root commands without root access. Nitwhit, you :D");
+        
+        List<String> args = new ArrayList<>();
+        if (!cmds[0].equals("su"))
+            args.add("su");
+        args.addAll(Arrays.asList(cmds));
+        
+        return adbController.executeADBCommand(true, remount, device, args);
+    }
     
 }
