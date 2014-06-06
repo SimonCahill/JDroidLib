@@ -25,6 +25,7 @@ import java.util.*;
 import JDroidLib.android.controllers.ADBController;
 import JDroidLib.android.device.Device;
 import JDroidLib.enums.*;
+import JDroidLib.exceptions.*;
 
 /**
  * This is Captain Kirk! Say hello! He will be our commander and captain,
@@ -50,8 +51,9 @@ public class CaptainKirk {
      * @throws InterruptedException if the thread's sleep(s) get interrupted.
      * Don't ask why it needs to sleep. Let's just say it'll get cranky if it
      * doesn't.
+     * @throws JDroidLib.exceptions.OSNotSupportedException If JDroi8dLib detects an unsupported OS.
      */
-    public CaptainKirk() throws IOException, ZipException, InterruptedException {
+    public CaptainKirk() throws IOException, ZipException, InterruptedException, OSNotSupportedException {
         resMan = new ResourceManager();
         if (System.getProperty("os.name").toLowerCase().equals("linux")) {
             resMan.install(OS.LINUX, "Default");
