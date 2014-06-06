@@ -87,7 +87,6 @@ public class CaptainKirk {
      * @throws IOException when something went wrong.
      * @deprecated It is preferred that the new method is used, however, this method will not be removed, as it is still useful for when only executing a minimal amount of commands.
      */
-    @Deprecated
     public String executeADBCommand(boolean shell, boolean remount, String deviceSerial, String[] commands) throws IOException {
         ///////////////////
         // Variables /////
