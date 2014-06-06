@@ -20,6 +20,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 
 import JDroidLib.enums.OS;
+import JDroidLib.exceptions.*;
 
 /**
  * ResourceManager - Manages resources used in JDroidLib.
@@ -46,14 +47,18 @@ public class ResourceManager {
      * @param location the installation dir. NEVER INPUT AN ACTUAL FILE HERE!
      *
      * @throws IOException,
-     *                              @
-     * throws ZipException
+     * @throws net.lingala.zip4j.exception.ZipException If an exception occurred while unzipping the archives.
+     * @throws JDroidLib.exceptions.OSNotSupportedException If JDroidLib detects an unsupported OS.
      *                             and also
      * @throws InterruptedException if something goes wrong.
      */
-    public void install(OS os, String location) throws IOException, ZipException, InterruptedException {
+    public void install(OS os, String location) throws IOException, ZipException, InterruptedException, OSNotSupportedException {
         if (location.equals("Default"))
-            new Installer().install(os, new File(System.getProperty("user.home") + "/.jdroidlib/bin/"));
+            if (os == OS.LINUX || os == OS.MAC_OS)
+                new Installer().install(os, new File(System.getProperty("user.home") + "/.jdroidlib/bin/"));
+            else if (os == OS.WINDOWS)
+                new Installer().install(os, new File(System.getProperty("user.home") + "/AppData/Roaming/JDroidLib/bin/"));
+            else throw new OSNotSupportedException("The current operating system is not supported by JDroidLib. OS Name: " + System.getProperty("os.name"));
         else
             new Installer().install(os, new File(location));
     }
