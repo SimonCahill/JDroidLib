@@ -1,4 +1,4 @@
-/* Copyright (C) 2014 beatsleigher.
+/* Copyright (C) 2014 Beatsleigher.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -65,7 +65,7 @@ import JDroidLib.util.CaptainKirk;
  * @since beta
  *
  */
-@SuppressWarnings({"MismatchedQueryAndUpdateOfCollection", "UnusedAssignment", "StringConcatenationInsideStringBufferAppend", "ConvertToTryWithResources"})
+@SuppressWarnings({"MismatchedQueryAndUpdateOfCollection", "StringConcatenationInsideStringBufferAppend", "ConvertToTryWithResources"})
 public final class ADBController {
 
     private CaptainKirk controller = null;
@@ -149,11 +149,10 @@ public final class ADBController {
      * @throws ZipException If an error occurred while extracting ADB binaries.
      * @throws InterruptedException If something prevented the thread from correctly sleeping.
      * @author Beatsleigher That would be my humble self :)
-     * @throws JDroidLib.exceptions.OSNotSupportedException If JDroidLib detects an unsupported OS.
      * @since beta
      *
      */
-    public ADBController() throws IOException, ZipException, InterruptedException, OSNotSupportedException {
+    public ADBController() throws IOException, ZipException, InterruptedException {
         controller = new CaptainKirk();
         startServer();
         fbController = new FastbootController(controller);

@@ -19,7 +19,6 @@
 package JDroidLib.android.controllers;
 
 import JDroidLib.enums.RebootTo;
-import JDroidLib.exceptions.*;
 import JDroidLib.util.CaptainKirk;
 
 import java.io.*;
@@ -54,14 +53,13 @@ public class FastbootController {
      * Emergency constructor. This constructor will attempt to install ADB and
      * fastboot, and will cause problems when ADBController is in use. Unless
      * your program is specifically designed to work <i>only</i> with fastboot,
-     * use @see {ADBController.getFastbootController()}.
+     * use @see #code ADBController.getFastbootController().
      *
      * @throws IOException
      * @throws ZipException
      * @throws InterruptedException
-     * @throws JDroidLib.exceptions.OSNotSupportedException If JDroidLib detects an unsupported OS.
      */
-    public FastbootController() throws IOException, ZipException, InterruptedException, OSNotSupportedException {
+    public FastbootController() throws IOException, ZipException, InterruptedException {
         controller = new CaptainKirk();
     }
 
