@@ -157,7 +157,7 @@ public final class ADBController {
         System.out.println("Waking Captain Kirk...");
         controller = new CaptainKirk();
         System.out.println("Starting ADB server...");
-        //startServer();
+        startServer();
         System.out.append("Preparing JDroidLib for fastboot...");
         fbController = new FastbootController(controller);
     }

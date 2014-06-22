@@ -145,7 +145,8 @@ public class CaptainKirk {
         processReader = new BufferedReader(new InputStreamReader(pr.getInputStream()));
         while ((line = processReader.readLine()) != null) {
             System.out.println(line);
-            str.append(line + "\n");
+            if (!line.startsWith("*"))
+                str.append(line + "\n");
         }
         pr.destroy();
         processReader.close();
@@ -208,7 +209,8 @@ public class CaptainKirk {
         pr = process.start();
         reader = new BufferedReader(new InputStreamReader(pr.getInputStream()));
         while ((line = reader.readLine()) != null)
-            str.append(line + "\n");
+            if (!line.startsWith("*"))
+                str.append(line + "\n");
         if (str.toString().trim().equals(""))
             return null;
         else return str.toString();
@@ -244,7 +246,8 @@ public class CaptainKirk {
         pr = process.start();
         reader = new BufferedReader(new InputStreamReader(pr.getInputStream()));
         while ((line = reader.readLine()) != null)
-            str.append(line + "\n");
+            if (!line.startsWith("*"))
+                str.append(line + "\n");
         if (str.toString().trim().equals(""))
             return null;
         else return str.toString();
@@ -300,7 +303,8 @@ public class CaptainKirk {
         pr = process.start();
         processReader = new BufferedReader(new InputStreamReader(pr.getInputStream()));
         while ((line = processReader.readLine()) != null) {
-            str.append(line + "\n");
+            if (!line.startsWith("*"))
+                str.append(line + "\n");
         }
         pr.destroy();
         processReader.close();
@@ -355,7 +359,8 @@ public class CaptainKirk {
         pr = process.start();
         processReader = new BufferedReader(new InputStreamReader(pr.getInputStream()));
         while ((line = processReader.readLine()) != null) {
-            str.append(line + "\n");
+            if (!line.startsWith("*"))
+                str.append(line + "\n");
         }
         pr.destroy();
         processReader.close();
