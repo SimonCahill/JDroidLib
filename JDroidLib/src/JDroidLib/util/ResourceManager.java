@@ -37,6 +37,9 @@ import JDroidLib.exceptions.*;
  * @version 1.0
  */
 public class ResourceManager {
+    
+    private File adb = null;
+    private File fastboot = null;
 
     /**
      * Installs ADB to system. Is called by ADBController or CaptainKirk by
@@ -62,6 +65,18 @@ public class ResourceManager {
         else
             new Installer().install(os, new File(location));
     }
+    
+    /**
+     * Returns a File-object which represents the ADB-binary.
+     * @return adb[.exe]
+     */
+    public File getADB() { return adb; }
+    
+    /**
+     * Returns a File-object which represents the Fastboot-binary.
+     * @return fastboot[.exe]
+     */
+    public File getFastboot() { return fastboot; }
 
     /**
      * You are not meant to understand this code.
@@ -72,12 +87,18 @@ public class ResourceManager {
             switch (os) {
                 case LINUX:
                     installOnLinux(location);
+                    adb = new File(location + "/adb");
+                    fastboot = new File(location + "/fastboot");
                     break;
                 case MAC_OS:
                     installOnMac(location);
+                    adb = new File(location + "/adb");
+                    fastboot = new File(location + "/fastboot");
                     break;
                 case WINDOWS:
                     installOnWin(location);
+                    adb = new File(location + "/adb.exe");
+                    fastboot = new File(location + "/fastboot.exe");
                     break;
             }
         }
@@ -110,6 +131,7 @@ public class ResourceManager {
                     adb_tools.delete();
                 } catch (IOException | ZipException | InterruptedException ex) {
                     System.err.println("ERROR: Error while extracting adb_tools in " + location + " on system: Linux\n" + ex.toString());
+                    throw ex;
                 }
         }
 

@@ -54,25 +54,26 @@ public class CaptainKirk {
      * @throws JDroidLib.exceptions.OSNotSupportedException If JDroi8dLib detects an unsupported OS.
      */
     public CaptainKirk() throws IOException, ZipException, InterruptedException, OSNotSupportedException {
+        System.out.println("Preparing resources...");
         resMan = new ResourceManager();
+        System.out.println("Determining install path for ADB binaries...");
         if (System.getProperty("os.name").toLowerCase().equals("linux")) {
+            System.out.println("Installing Linux binaries...");
             resMan.install(OS.LINUX, "Default");
         } else if (System.getProperty("os.name").toLowerCase().contains("mac")) {
+            System.out.println("Installing Mac OS X binaries...");
             resMan.install(OS.MAC_OS, "Default");
         } else {
+            System.out.println("Installing Windows binaries...");
             resMan.install(OS.WINDOWS, "Default");
         }
-        if (System.getProperty("os.name").toLowerCase().equals("linux") || System.getProperty("os.name").toLowerCase().contains("mac")) {
-            adb = new File(System.getProperty("user.home") + "/.jdroidlib/bin/adb");
-            adb.deleteOnExit();
-            fastboot = new File(System.getProperty("user.home") + "/.jdroidlib/bin/fastboot");
-            fastboot.deleteOnExit();
-        } else {
-            adb = new File(System.getProperty("user.home") + "/.jdroidlib/bin/adb.exe");
-            adb.deleteOnExit();
-            fastboot = new File(System.getProperty("user.home") + "/.jdroidlib/bin/fastboot.exe");
-            fastboot.deleteOnExit();
-        }
+        
+        System.out.println("Getting files and paths...");
+        adb = resMan.getADB(); adb.deleteOnExit();
+        fastboot = resMan.getFastboot(); fastboot.deleteOnExit();
+        
+        System.out.println("ADB Location: " + adb.getAbsolutePath() + "\nFastboot Location: " + fastboot.getAbsolutePath());
+        System.out.println("Resources initialized...");
     }
 
     /**
@@ -87,7 +88,6 @@ public class CaptainKirk {
      * shell).
      * @return ADB output as String.
      * @throws IOException when something went wrong.
-     * @deprecated It is preferred that the new method is used, however, this method will not be removed, as it is still useful for when only executing a minimal amount of commands.
      */
     public String executeADBCommand(boolean shell, boolean remount, String deviceSerial, String[] commands) throws IOException {
         ///////////////////
@@ -104,10 +104,11 @@ public class CaptainKirk {
         // Remount device//
         //////////////////
         if (remount) {
-            args.add(adb.toString());
+            args.add(adb.getAbsolutePath());
             if (deviceSerial != null && !deviceSerial.isEmpty()) {
                 args.add("-s " + deviceSerial);
             }
+            
             args.add("remount");
             process.command(args);
             pr = process.start();
@@ -115,6 +116,7 @@ public class CaptainKirk {
             while ((line = processReader.readLine()) != null) {
                 // Wait for remounting to finish.
             }
+            
             pr.destroy();
             pr = null;
             processReader.close();
@@ -125,21 +127,24 @@ public class CaptainKirk {
         ////////////////////
         // Execute command/
         //////////////////
-        args.add(adb.toString());
-        if (deviceSerial != null) {
+        args.add(adb.getAbsolutePath());
+        if (deviceSerial != null && !deviceSerial.equals("")) {
             args.add("-s");
             args.add(deviceSerial);
         }
         if (shell) 
             args.add("shell");
         
-        if (commands != null) 
-            args.addAll(Arrays.asList(commands));
+        for (String arg : commands) {
+            System.out.println("Found arg: " + str);
+            args.add(arg);
+        }
         
         process.command(args);
         pr = process.start();
         processReader = new BufferedReader(new InputStreamReader(pr.getInputStream()));
         while ((line = processReader.readLine()) != null) {
+            System.out.println(line);
             str.append(line + "\n");
         }
         pr.destroy();
@@ -329,7 +334,7 @@ public class CaptainKirk {
         ////////////////////
         // Execute command/
         //////////////////
-        args.add(adb.toString());
+        args.add(adb.getAbsolutePath());
         if (deviceSerial != null && !deviceSerial.isEmpty()) {
             args.add("-s");
             args.add(deviceSerial);
@@ -421,7 +426,7 @@ public class CaptainKirk {
      */
     public List<Device> getConnectedDevices(ADBController controller) throws IOException {
         List<Device> devices = new ArrayList<>();
-        String[] cmd = {"devices"};
+        String[] cmd = new String[]{"devices"};
 
         String raw = executeADBCommand(false, false, "", cmd);
         BufferedReader reader = new BufferedReader(new StringReader(raw));

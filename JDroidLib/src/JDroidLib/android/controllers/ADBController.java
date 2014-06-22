@@ -90,7 +90,7 @@ public final class ADBController {
      * @since beta
      *
      */
-    public void startServer() throws IOException { controller.executeADBCommand(false, false, "", new String[]{"start-server"}); }
+    public void startServer() throws IOException { System.out.println(controller.executeADBCommand(false, false, "", new String[]{"start-server"})); }
 
     /**
      * Kills the ADB server running on local machine.
@@ -154,8 +154,11 @@ public final class ADBController {
      *
      */
     public ADBController() throws IOException, ZipException, InterruptedException, OSNotSupportedException {
+        System.out.println("Waking Captain Kirk...");
         controller = new CaptainKirk();
-        startServer();
+        System.out.println("Starting ADB server...");
+        //startServer();
+        System.out.append("Preparing JDroidLib for fastboot...");
         fbController = new FastbootController(controller);
     }
 
