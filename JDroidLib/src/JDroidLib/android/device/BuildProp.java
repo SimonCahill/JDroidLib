@@ -125,7 +125,7 @@ public class BuildProp {
     public void setProp(String key, String value, boolean rebootAfter) throws IOException {
         adbController.executeADBCommand(true, false, device, new String[]{"setprop", key, value});
         if (rebootAfter)
-            adbController.rebootDevice(device.toString(), RebootTo.ANDROID);
+            adbController.rebootDevice(device, RebootTo.ANDROID);
     }
     
     /**
