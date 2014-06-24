@@ -216,6 +216,66 @@ public class CaptainKirk {
         else return str.toString();
     }
     
+    /**
+     * Executes an ADB command with the provided commands/arguments.
+     * Please note: JDroidLib takes care of the initial arguments, such as the ADB command itself and the <b>specific device</b> command and (if applicable) the <i>shell</i> command..
+     * Please only provide this method with secondary commands, for example: 
+     * <b>EXAMPLE METHOD:</b>
+     * List< String > args = new ArrayList<>();
+     * ADBController adbController = new ADBController();
+     * Device aDevice = adbController.getDevice("a device's serial");
+     * 
+     * args.add("su"); // Initial command is set to su (super user binary)
+     * args.add("-v"); // Secondary command is set to su's -v arg (version)
+     * 
+     * 
+     * adbController.executeADBCommand(true, false, <i>aDevice</i>, args); // Collects all necessary arguments and then issues the command to the specific device.
+     * @param asShell Issue command as a shell command
+     * @param remount Remount the device prior to executing the command
+     * @param serial A String object. (The specific device to which to issue the command).
+     * @param commands A list of commands/arguments to execute (please do <b>NOT</b> add <i>adb</i> or any direct ADB commands!
+     * @return ADB's output
+     * @throws IOException If something goes wrong when executing the process or reading from the process.
+     * @throws NullPointerException If no device or command is provided.
+     */
+    public String executeADBCommand(boolean asShell, boolean remount, String serial, List<String> commands) throws IOException {
+        //# =============== Variables =============== #\\
+        StringBuilder str = new StringBuilder();
+        ProcessBuilder process = new ProcessBuilder();
+        Process pr = null;
+        BufferedReader reader = null;
+        String line = null;
+        List<String> args = new ArrayList<>();
+        
+        if (serial == null)
+            throw new NullPointerException("Device object not set to the instance of an object.");
+        if (commands.isEmpty())
+            throw new NullPointerException("No commands/arguments were issued.");
+        
+        if (remount)
+            remountDevice(serial);
+        
+        args.add(adb.getAbsolutePath());
+        args.add("-s");
+        args.add(serial);
+        if (asShell)
+            args.add("shell");
+        for (String s : commands)
+            args.add(s);
+        
+        //# =============== Execute Commands =============== #\\
+        process.command(args);
+        process.redirectErrorStream(true);
+        pr = process.start();
+        reader = new BufferedReader(new InputStreamReader(pr.getInputStream()));
+        while ((line = reader.readLine()) != null)
+            if (!line.startsWith("*"))
+                str.append(line + "\n");
+        if (str.toString().trim().equals(""))
+            return null;
+        else return str.toString();
+    }
+    
     public String executeADBCommand(boolean asShell, boolean remount, Device device, String[] commands) throws IOException, NullPointerException {
         //# =============== Variables =============== #\\
         StringBuilder str = new StringBuilder();
@@ -268,6 +328,23 @@ public class CaptainKirk {
         List<String> args = new ArrayList<>();
         args.add("remount");
         executeADBCommand(false, false, device, args);
+    }
+    
+    /**
+     * Remounts a given device.
+     * @param serial The device to remount
+     * @throws IOException If something goes wrong while executing the process.
+     * @throws NullPointerException If no device is issued.
+     */
+    public void remountDevice(String serial) throws IOException {        
+        //# =============== Execute Command =============== #\\
+        List<String> args = new ArrayList<>();
+        if (serial != null && !serial.equals("")) {
+            args.add("-s");
+            args.add(serial);
+        }
+        args.add("remount");
+        executeADBCommand(false, false, serial, args);
     }
 
     /**
