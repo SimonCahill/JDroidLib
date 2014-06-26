@@ -21,14 +21,14 @@ import net.lingala.zip4j.exception.ZipException;
 
 import java.io.*;
 import java.util.*;
+import java.net.URL;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
 
 import JDroidLib.android.controllers.ADBController;
 import JDroidLib.android.device.Device;
 import JDroidLib.enums.*;
 import JDroidLib.exceptions.*;
-import java.net.URL;
-import java.nio.channels.Channels;
-import java.nio.channels.ReadableByteChannel;
 
 /**
  * This is Captain Kirk! Say hello! He will be our commander and captain,
@@ -83,6 +83,8 @@ public class CaptainKirk {
                     FileOutputStream output = new FileOutputStream(fastboot);
                     // Write to file
                     output.getChannel().transferFrom(channel, 0, Long.MAX_VALUE);
+                    output.close();
+                    channel.close();
                 } finally {
                     System.out.println("Fastboot: File transfer complete!");
                 }
@@ -93,6 +95,8 @@ public class CaptainKirk {
                     FileOutputStream output = new FileOutputStream(fastboot);
                     // Write to file
                     output.getChannel().transferFrom(channel, 0, Long.MAX_VALUE);
+                    output.close();
+                    channel.close();
                 } finally {
                     System.out.println("Fastboot: File transfer complete!");
                 }
@@ -103,6 +107,8 @@ public class CaptainKirk {
                     FileOutputStream output = new FileOutputStream(fastboot);
                     // Write to file
                     output.getChannel().transferFrom(channel, 0, Long.MAX_VALUE);
+                    output.close();
+                    channel.close();
                 } finally {
                     System.out.println("Fastboot: File transfer complete!");
                 }
