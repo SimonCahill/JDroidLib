@@ -26,6 +26,9 @@ import JDroidLib.android.controllers.ADBController;
 import JDroidLib.android.device.Device;
 import JDroidLib.enums.*;
 import JDroidLib.exceptions.*;
+import java.net.URL;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
 
 /**
  * This is Captain Kirk! Say hello! He will be our commander and captain,
@@ -71,6 +74,38 @@ public class CaptainKirk {
         System.out.println("Getting files and paths...");
         adb = resMan.getADB(); adb.deleteOnExit();
         fastboot = resMan.getFastboot(); fastboot.deleteOnExit();
+        
+        if (!fastboot.exists()) 
+            if (System.getProperty("os.name").toLowerCase().contains("windows"))
+                try {
+                    System.out.println("Fastboot binary not found. Downloading from server...");
+                    ReadableByteChannel channel = Channels.newChannel(new URL("http://team-m4gkbeatz.eu/download/binaries/adb-win/fastboot.exe").openStream());
+                    FileOutputStream output = new FileOutputStream(fastboot);
+                    // Write to file
+                    output.getChannel().transferFrom(channel, 0, Long.MAX_VALUE);
+                } finally {
+                    System.out.println("Fastboot: File transfer complete!");
+                }
+            else if (System.getProperty("os.name").toLowerCase().equals("linux")) 
+                try {
+                    System.out.println("Fastboot binary not found. Downloading from server...");
+                    ReadableByteChannel channel = Channels.newChannel(new URL("http://team-m4gkbeatz.eu/download/binaries/adb-linux/fastboot").openStream());
+                    FileOutputStream output = new FileOutputStream(fastboot);
+                    // Write to file
+                    output.getChannel().transferFrom(channel, 0, Long.MAX_VALUE);
+                } finally {
+                    System.out.println("Fastboot: File transfer complete!");
+                }
+            else // Assume it's a Mac - BSD isn't supported by JDroidLib, so it's pretty safe to make this assumption
+                try {
+                    System.out.println("Fastboot binary not found. Downloading from server...");
+                    ReadableByteChannel channel = Channels.newChannel(new URL("http://team-m4gkbeatz.eu/download/binaries/adb-mac/fastboot").openStream());
+                    FileOutputStream output = new FileOutputStream(fastboot);
+                    // Write to file
+                    output.getChannel().transferFrom(channel, 0, Long.MAX_VALUE);
+                } finally {
+                    System.out.println("Fastboot: File transfer complete!");
+                }
         
         System.out.println("ADB Location: " + adb.getAbsolutePath() + "\nFastboot Location: " + fastboot.getAbsolutePath());
         System.out.println("Resources initialized...");
