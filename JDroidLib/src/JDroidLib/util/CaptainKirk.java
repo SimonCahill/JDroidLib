@@ -17,6 +17,11 @@
  */
 package JDroidLib.util;
 
+import JDroidLib.android.controllers.ADBController;
+import JDroidLib.android.device.Device;
+import JDroidLib.enums.*;
+import JDroidLib.exceptions.*;
+
 import net.lingala.zip4j.exception.ZipException;
 
 import java.io.*;
@@ -24,11 +29,9 @@ import java.util.*;
 import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
-
-import JDroidLib.android.controllers.ADBController;
-import JDroidLib.android.device.Device;
-import JDroidLib.enums.*;
-import JDroidLib.exceptions.*;
+import java.net.InetAddress;
+import java.nio.file.CopyOption;
+import java.nio.file.Files;
 
 /**
  * This is Captain Kirk! Say hello! He will be our commander and captain,
@@ -43,6 +46,7 @@ public class CaptainKirk {
     ResourceManager resMan = null;
     private File adb = null;
     private File fastboot = null;
+    private final File backupDir;
 
     /**
      * Default constructor: Installs ADB/fastboot and gets other data.
@@ -54,7 +58,8 @@ public class CaptainKirk {
      * @throws InterruptedException if the thread's sleep(s) get interrupted.
      * Don't ask why it needs to sleep. Let's just say it'll get cranky if it
      * doesn't.
-     * @throws JDroidLib.exceptions.OSNotSupportedException If JDroi8dLib detects an unsupported OS.
+     * @throws JDroidLib.exceptions.OSNotSupportedException If JDroi8dLib
+     * detects an unsupported OS.
      */
     public CaptainKirk() throws IOException, ZipException, InterruptedException, OSNotSupportedException {
         System.out.println("Preparing resources...");
@@ -70,49 +75,74 @@ public class CaptainKirk {
             System.out.println("Installing Windows binaries...");
             resMan.install(OS.WINDOWS, "Default");
         }
-        
+
         System.out.println("Getting files and paths...");
-        adb = resMan.getADB(); adb.deleteOnExit();
-        fastboot = resMan.getFastboot(); fastboot.deleteOnExit();
-        
-        if (!fastboot.exists()) 
-            if (System.getProperty("os.name").toLowerCase().contains("windows"))
-                try {
-                    System.out.println("Fastboot binary not found. Downloading from server...");
-                    ReadableByteChannel channel = Channels.newChannel(new URL("http://team-m4gkbeatz.eu/download/binaries/adb-win/fastboot.exe").openStream());
-                    FileOutputStream output = new FileOutputStream(fastboot);
-                    // Write to file
-                    output.getChannel().transferFrom(channel, 0, Long.MAX_VALUE);
-                    output.close();
-                    channel.close();
-                } finally {
-                    System.out.println("Fastboot: File transfer complete!");
+        adb = resMan.getADB();
+        adb.deleteOnExit();
+        fastboot = resMan.getFastboot();
+        fastboot.deleteOnExit();
+        backupDir = resMan.getBackupDir();
+
+        if (!backupDir.exists()) {
+            backupDir.mkdirs();
+        }
+
+        if (!fastboot.exists()) {
+            try {
+                if (InetAddress.getByName("http://team-m4gkbeatz.eu").isReachable(500)) {
+                    if (System.getProperty("os.name").toLowerCase().contains("windows")) {
+                        try {
+                            System.out.println("Fastboot binary not found. Downloading from server...");
+                            ReadableByteChannel channel = Channels.newChannel(new URL("http://team-m4gkbeatz.eu/download/binaries/adb-win/fastboot.exe").openStream());
+                            FileOutputStream output = new FileOutputStream(fastboot);
+                            // Write to file
+                            output.getChannel().transferFrom(channel, 0, Long.MAX_VALUE);
+                            output.close();
+                            channel.close();
+                        } finally {
+                            System.out.println("Fastboot: File transfer complete!");
+
+                        }
+                    } else if (System.getProperty("os.name").toLowerCase().equals("linux")) {
+                        try {
+                            System.out.println("Fastboot binary not found. Downloading from server...");
+                            ReadableByteChannel channel = Channels.newChannel(new URL("http://team-m4gkbeatz.eu/download/binaries/adb-linux/fastboot").openStream());
+                            FileOutputStream output = new FileOutputStream(fastboot);
+                            // Write to file
+                            output.getChannel().transferFrom(channel, 0, Long.MAX_VALUE);
+                            output.close();
+                            channel.close();
+                        } finally {
+                            System.out.println("Fastboot: File transfer complete!");
+                        }
+                    } else { // Assume it's a Mac - BSD isn't supported by JDroidLib, so it's pretty safe to make this assumption
+                    
+                        try {
+                            System.out.println("Fastboot binary not found. Downloading from server...");
+                            ReadableByteChannel channel = Channels.newChannel(new URL("http://team-m4gkbeatz.eu/download/binaries/adb-mac/fastboot").openStream());
+                            FileOutputStream output = new FileOutputStream(fastboot);
+                            // Write to file
+                            output.getChannel().transferFrom(channel, 0, Long.MAX_VALUE);
+                            output.close();
+                            channel.close();
+                        } finally {
+                            System.out.println("Fastboot: File transfer complete!");
+                        }
+                    }
                 }
-            else if (System.getProperty("os.name").toLowerCase().equals("linux")) 
-                try {
-                    System.out.println("Fastboot binary not found. Downloading from server...");
-                    ReadableByteChannel channel = Channels.newChannel(new URL("http://team-m4gkbeatz.eu/download/binaries/adb-linux/fastboot").openStream());
-                    FileOutputStream output = new FileOutputStream(fastboot);
-                    // Write to file
-                    output.getChannel().transferFrom(channel, 0, Long.MAX_VALUE);
-                    output.close();
-                    channel.close();
-                } finally {
-                    System.out.println("Fastboot: File transfer complete!");
+
+                // Copy files to backupDir just in case the computer doesn't have an Internet connection and fastboot needs to be copied.
+                for (File f : fastboot.getParentFile().listFiles()) {
+                    Files.copy(f.toPath(), new File(backupDir.getAbsoluteFile() + "/" + f.getName()).toPath());
                 }
-            else // Assume it's a Mac - BSD isn't supported by JDroidLib, so it's pretty safe to make this assumption
-                try {
-                    System.out.println("Fastboot binary not found. Downloading from server...");
-                    ReadableByteChannel channel = Channels.newChannel(new URL("http://team-m4gkbeatz.eu/download/binaries/adb-mac/fastboot").openStream());
-                    FileOutputStream output = new FileOutputStream(fastboot);
-                    // Write to file
-                    output.getChannel().transferFrom(channel, 0, Long.MAX_VALUE);
-                    output.close();
-                    channel.close();
-                } finally {
-                    System.out.println("Fastboot: File transfer complete!");
+
+            } catch (IOException ex) {
+                for (File f : backupDir.listFiles()) {
+                    Files.copy(f.toPath(), new File(backupDir + "/" + f.getName()).toPath());
                 }
-        
+            }
+        }
+
         System.out.println("ADB Location: " + adb.getAbsolutePath() + "\nFastboot Location: " + fastboot.getAbsolutePath());
         System.out.println("Resources initialized...");
     }
@@ -149,7 +179,7 @@ public class CaptainKirk {
             if (deviceSerial != null && !deviceSerial.isEmpty()) {
                 args.add("-s " + deviceSerial);
             }
-            
+
             args.add("remount");
             process.command(args);
             pr = process.start();
@@ -157,7 +187,7 @@ public class CaptainKirk {
             while ((line = processReader.readLine()) != null) {
                 // Wait for remounting to finish.
             }
-            
+
             pr.destroy();
             pr = null;
             processReader.close();
@@ -173,21 +203,23 @@ public class CaptainKirk {
             args.add("-s");
             args.add(deviceSerial);
         }
-        if (shell) 
+        if (shell) {
             args.add("shell");
-        
+        }
+
         for (String arg : commands) {
             System.out.println("Found arg: " + str);
             args.add(arg);
         }
-        
+
         process.command(args);
         pr = process.start();
         processReader = new BufferedReader(new InputStreamReader(pr.getInputStream()));
         while ((line = processReader.readLine()) != null) {
             System.out.println(line);
-            if (!line.startsWith("*"))
+            if (!line.startsWith("*")) {
                 str.append(line + "\n");
+            }
         }
         pr.destroy();
         processReader.close();
@@ -196,27 +228,35 @@ public class CaptainKirk {
 
         return str.toString();
     }
-    
+
     /**
-     * Executes an ADB command with the provided commands/arguments.
-     * Please note: JDroidLib takes care of the initial arguments, such as the ADB command itself and the <b>specific device</b> command and (if applicable) the <i>shell</i> command..
-     * Please only provide this method with secondary commands, for example: 
+     * Executes an ADB command with the provided commands/arguments. Please
+     * note: JDroidLib takes care of the initial arguments, such as the ADB
+     * command itself and the <b>specific device</b> command and (if applicable)
+     * the <i>shell</i> command.. Please only provide this method with secondary
+     * commands, for example:
      * <b>EXAMPLE METHOD:</b>
-     * List< String > args = new ArrayList<>();
-     * ADBController adbController = new ADBController();
-     * Device aDevice = adbController.getDevice("a device's serial");
-     * 
+     * List< String > args = new ArrayList<>(); ADBController adbController =
+     * new ADBController(); Device aDevice = adbController.getDevice("a device's
+     * serial");
+     *
      * args.add("su"); // Initial command is set to su (super user binary)
      * args.add("-v"); // Secondary command is set to su's -v arg (version)
-     * 
-     * 
-     * adbController.executeADBCommand(true, false, <i>aDevice</i>, args); // Collects all necessary arguments and then issues the command to the specific device.
+     *
+     *
+     * adbController.executeADBCommand(true, false, <i>aDevice</i>, args); //
+     * Collects all necessary arguments and then issues the command to the
+     * specific device.
+     *
      * @param asShell Issue command as a shell command
      * @param remount Remount the device prior to executing the command
-     * @param device A device object. (The specific device to which to issue the command).
-     * @param command A list of commands/arguments to execute (please do <b>NOT</b> add <i>adb</i> or any direct ADB commands!
+     * @param device A device object. (The specific device to which to issue the
+     * command).
+     * @param command A list of commands/arguments to execute (please do
+     * <b>NOT</b> add <i>adb</i> or any direct ADB commands!
      * @return ADB's output
-     * @throws IOException If something goes wrong when executing the process or reading from the process.
+     * @throws IOException If something goes wrong when executing the process or
+     * reading from the process.
      * @throws NullPointerException If no device or command is provided.
      */
     public String executeADBCommand(boolean asShell, boolean remount, Device device, List<String> command) throws IOException, NullPointerException {
@@ -227,56 +267,73 @@ public class CaptainKirk {
         BufferedReader reader = null;
         String line = null;
         List<String> args = new ArrayList<>();
-        
-        if (device == null)
+
+        if (device == null) {
             throw new NullPointerException("Device object not set to the instance of an object.");
-        if (command.isEmpty())
+        }
+        if (command.isEmpty()) {
             throw new NullPointerException("No commands/arguments were issued.");
-        
-        if (remount)
+        }
+
+        if (remount) {
             remountDevice(device);
-        
+        }
+
         args.add(adb.getAbsolutePath());
         args.add("-s");
         args.add(device.toString());
-        if (asShell)
+        if (asShell) {
             args.add("shell");
-        for (String s : command)
+        }
+        for (String s : command) {
             args.add(s);
-        
+        }
+
         //# =============== Execute Commands =============== #\\
         process.command(args);
         process.redirectErrorStream(true);
         pr = process.start();
         reader = new BufferedReader(new InputStreamReader(pr.getInputStream()));
-        while ((line = reader.readLine()) != null)
-            if (!line.startsWith("*"))
+        while ((line = reader.readLine()) != null) {
+            if (!line.startsWith("*")) {
                 str.append(line + "\n");
-        if (str.toString().trim().equals(""))
+            }
+        }
+        if (str.toString().trim().equals("")) {
             return null;
-        else return str.toString();
+        } else {
+            return str.toString();
+        }
     }
-    
+
     /**
-     * Executes an ADB command with the provided commands/arguments.
-     * Please note: JDroidLib takes care of the initial arguments, such as the ADB command itself and the <b>specific device</b> command and (if applicable) the <i>shell</i> command..
-     * Please only provide this method with secondary commands, for example: 
+     * Executes an ADB command with the provided commands/arguments. Please
+     * note: JDroidLib takes care of the initial arguments, such as the ADB
+     * command itself and the <b>specific device</b> command and (if applicable)
+     * the <i>shell</i> command.. Please only provide this method with secondary
+     * commands, for example:
      * <b>EXAMPLE METHOD:</b>
-     * List< String > args = new ArrayList<>();
-     * ADBController adbController = new ADBController();
-     * Device aDevice = adbController.getDevice("a device's serial");
-     * 
+     * List< String > args = new ArrayList<>(); ADBController adbController =
+     * new ADBController(); Device aDevice = adbController.getDevice("a device's
+     * serial");
+     *
      * args.add("su"); // Initial command is set to su (super user binary)
      * args.add("-v"); // Secondary command is set to su's -v arg (version)
-     * 
-     * 
-     * adbController.executeADBCommand(true, false, <i>aDevice</i>, args); // Collects all necessary arguments and then issues the command to the specific device.
+     *
+     *
+     * adbController.executeADBCommand(true, false, <i>aDevice</i>, args); //
+     * Collects all necessary arguments and then issues the command to the
+     * specific device.
+     *
      * @param asShell Issue command as a shell command
      * @param remount Remount the device prior to executing the command
-     * @param serial A String object. (The specific device to which to issue the command).
-     * @param commands A list of commands/arguments to execute (please do <b>NOT</b> add <i>adb</i> or any direct ADB commands!
+     * @param serial A String object. (The specific device to which to issue the
+     * command).
+     * @param commands A list of commands/arguments to execute (please do
+     * <b>NOT</b> add <i>adb</i> or any direct ADB commands!
      * @return ADB's output
-     * @throws IOException If something goes wrong when executing the process or reading from the process.
+     * @throws IOException If something goes wrong when executing the process or
+     * reading from the process.
      * @throws NullPointerException If no device or command is provided.
      */
     public String executeADBCommand(boolean asShell, boolean remount, String serial, List<String> commands) throws IOException {
@@ -287,36 +344,45 @@ public class CaptainKirk {
         BufferedReader reader = null;
         String line = null;
         List<String> args = new ArrayList<>();
-        
-        if (serial == null)
+
+        if (serial == null) {
             throw new NullPointerException("Device object not set to the instance of an object.");
-        if (commands.isEmpty())
+        }
+        if (commands.isEmpty()) {
             throw new NullPointerException("No commands/arguments were issued.");
-        
-        if (remount)
+        }
+
+        if (remount) {
             remountDevice(serial);
-        
+        }
+
         args.add(adb.getAbsolutePath());
         args.add("-s");
         args.add(serial);
-        if (asShell)
+        if (asShell) {
             args.add("shell");
-        for (String s : commands)
+        }
+        for (String s : commands) {
             args.add(s);
-        
+        }
+
         //# =============== Execute Commands =============== #\\
         process.command(args);
         process.redirectErrorStream(true);
         pr = process.start();
         reader = new BufferedReader(new InputStreamReader(pr.getInputStream()));
-        while ((line = reader.readLine()) != null)
-            if (!line.startsWith("*"))
+        while ((line = reader.readLine()) != null) {
+            if (!line.startsWith("*")) {
                 str.append(line + "\n");
-        if (str.toString().trim().equals(""))
+            }
+        }
+        if (str.toString().trim().equals("")) {
             return null;
-        else return str.toString();
+        } else {
+            return str.toString();
+        }
     }
-    
+
     public String executeADBCommand(boolean asShell, boolean remount, Device device, String[] commands) throws IOException, NullPointerException {
         //# =============== Variables =============== #\\
         StringBuilder str = new StringBuilder();
@@ -325,59 +391,70 @@ public class CaptainKirk {
         BufferedReader reader = null;
         String line = null;
         List<String> args = new ArrayList<>();
-        
-        if (device == null)
+
+        if (device == null) {
             throw new NullPointerException("Device object not set to the instance of an object.");
-        if (commands.length == 0)
+        }
+        if (commands.length == 0) {
             throw new NullPointerException("No commands/arguments were issued.");
-        
-        if (remount)
+        }
+
+        if (remount) {
             remountDevice(device);
-        
+        }
+
         args.add(adb.getAbsolutePath());
         args.add("-s");
         args.add(device.toString());
-        if (asShell)
+        if (asShell) {
             args.add("shell");
+        }
         args.addAll(Arrays.asList(commands));
-        
+
         //# =============== Execute Commands =============== #\\
         process.command(args);
         process.redirectErrorStream(true);
         pr = process.start();
         reader = new BufferedReader(new InputStreamReader(pr.getInputStream()));
-        while ((line = reader.readLine()) != null)
-            if (!line.startsWith("*"))
+        while ((line = reader.readLine()) != null) {
+            if (!line.startsWith("*")) {
                 str.append(line + "\n");
-        if (str.toString().trim().equals(""))
+            }
+        }
+        if (str.toString().trim().equals("")) {
             return null;
-        else return str.toString();
+        } else {
+            return str.toString();
+        }
     }
-    
+
     /**
      * Remounts a given device.
+     *
      * @param device The device to remount
      * @throws IOException If something goes wrong while executing the process.
      * @throws NullPointerException If no device is issued.
      */
     public void remountDevice(Device device) throws IOException, NullPointerException {
-        
-        if (device == null)
+
+        if (device == null) {
             throw new NullPointerException("No device object provided");
-        
+        }
+
         //# =============== Execute Command =============== #\\
         List<String> args = new ArrayList<>();
         args.add("remount");
         executeADBCommand(false, false, device, args);
     }
-    
+
     /**
      * Remounts a given device.
+     *
      * @param serial The device to remount
      * @throws IOException If something goes wrong while executing the process.
      * @throws NullPointerException If no device is issued.
      */
-    public void remountDevice(String serial) throws IOException {        
+    public void remountDevice(String serial) throws IOException {
         //# =============== Execute Command =============== #\\
         List<String> args = new ArrayList<>();
         if (serial != null && !serial.equals("")) {
@@ -421,8 +498,9 @@ public class CaptainKirk {
         pr = process.start();
         processReader = new BufferedReader(new InputStreamReader(pr.getInputStream()));
         while ((line = processReader.readLine()) != null) {
-            if (!line.startsWith("*"))
+            if (!line.startsWith("*")) {
                 str.append(line + "\n");
+            }
         }
         pr.destroy();
         processReader.close();
@@ -477,8 +555,9 @@ public class CaptainKirk {
         pr = process.start();
         processReader = new BufferedReader(new InputStreamReader(pr.getInputStream()));
         while ((line = processReader.readLine()) != null) {
-            if (!line.startsWith("*"))
+            if (!line.startsWith("*")) {
                 str.append(line + "\n");
+            }
         }
         pr.destroy();
         processReader.close();
@@ -604,12 +683,15 @@ public class CaptainKirk {
     public String restartADBAsRoot(String serial) throws IOException {
         return executeADBCommand(false, false, serial, new String[]{"root"});
     }
-    
+
     /**
      * Returns the currently used ADB file.
-     * @return 
+     *
+     * @return
      */
-    public File getADB() { return adb; }
+    public File getADB() {
+        return adb;
+    }
 
 }
 

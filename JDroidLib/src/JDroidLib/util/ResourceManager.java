@@ -40,6 +40,7 @@ public class ResourceManager {
     
     private File adb = null;
     private File fastboot = null;
+    private File backupDir = null;
 
     /**
      * Installs ADB to system. Is called by ADBController or CaptainKirk by
@@ -77,6 +78,12 @@ public class ResourceManager {
      * @return fastboot[.exe]
      */
     public File getFastboot() { return fastboot; }
+    
+    /**
+     * Returns a File-object representing the backup directory.
+     * @return 
+     */
+    public File getBackupDir() { return backupDir; }
 
     /**
      * You are not meant to understand this code.
@@ -89,16 +96,19 @@ public class ResourceManager {
                     installOnLinux(location);
                     adb = new File(location + "/adb");
                     fastboot = new File(location + "/fastboot");
+                    backupDir = new File(location + "/../binBackup");
                     break;
                 case MAC_OS:
                     installOnMac(location);
                     adb = new File(location + "/adb");
                     fastboot = new File(location + "/fastboot");
+                    backupDir = new File(location + "/../binBackup");
                     break;
                 case WINDOWS:
                     installOnWin(location);
                     adb = new File(location + "/adb.exe");
                     fastboot = new File(location + "/fastboot.exe");
+                    backupDir = new File(location + "/../binBackup");
                     break;
             }
         }

@@ -21,9 +21,9 @@ public enum OS {
      * @return A type of @see OS
      * @throws OSNotSupportedException If no type of @see OS could be determined. 
      */
-    public OS getOS(String val) throws OSNotSupportedException {
+    public static OS getOS(String val) throws OSNotSupportedException {
         for (OS os : OS.values())
-            if ((os.toString()).contains(val))
+            if (val.contains(os.toString()))
                 return os;
         throw new OSNotSupportedException("OS \"" + val + "\" is not supported by JDroidLib!");
     }
