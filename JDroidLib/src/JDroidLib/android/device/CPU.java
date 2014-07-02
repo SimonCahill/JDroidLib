@@ -42,7 +42,7 @@ public class CPU {
      * @param device
      * @param adbController 
      */
-    public CPU(Device device, ADBController adbController) {
+    CPU(Device device, ADBController adbController) {
         this.device = device;
         this.adbController = adbController;
         cpuUsage = new ArrayList();

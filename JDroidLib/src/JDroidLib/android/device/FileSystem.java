@@ -39,7 +39,7 @@ public class FileSystem {
      * @param device the device for which to represent the file system
      * @param adbController an instance of ADBController. ALWAYS USE THE FIRST OBJECT CREATED!
      */
-    public FileSystem(Device device, ADBController adbController) {
+    FileSystem(Device device, ADBController adbController) {
         this.device = device;
         this.adbController = adbController;
     }

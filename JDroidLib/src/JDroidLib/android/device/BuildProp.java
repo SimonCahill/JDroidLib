@@ -40,7 +40,7 @@ public class BuildProp {
      * @param device The device this class should represent.
      * @param adbController The ADBController that makes this thing work.
      */
-    public BuildProp(Device device, ADBController adbController) {
+    BuildProp(Device device, ADBController adbController) {
         this.device = device;
         this.adbController = adbController;
     }

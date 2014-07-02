@@ -120,7 +120,7 @@ public class Battery {
     
     private ADBController adbController = null;
     
-    public Battery(Device device, ADBController adbController) {
+    Battery(Device device, ADBController adbController) {
         this.device = device;
         this.adbController = adbController;
     }

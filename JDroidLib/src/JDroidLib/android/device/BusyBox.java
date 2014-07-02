@@ -37,7 +37,7 @@ public class BusyBox {
     
     private final ADBController adbController;
     
-    public BusyBox(Device device, ADBController adbController) {
+    BusyBox(Device device, ADBController adbController) {
         this.device = device;
         this.adbController = adbController;
     }

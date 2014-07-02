@@ -43,7 +43,7 @@ public class SU {
      * @param device The device to represent
      * @param adbController The @see ADBController which powers everything.
      */
-    public SU(Device device, ADBController adbController) {
+    SU(Device device, ADBController adbController) {
         this.device = device;
         this.adbController = adbController;
     }
