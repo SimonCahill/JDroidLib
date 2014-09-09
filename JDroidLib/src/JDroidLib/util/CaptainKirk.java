@@ -47,6 +47,23 @@ public class CaptainKirk {
     private File adb = null;
     private File fastboot = null;
     private final File backupDir;
+    private static CaptainKirk instance = null;
+    
+    /**
+     * Singleton statement.
+     * Returns a CaptainKirk object. If no previous instance of this class was found, it will return a new instance
+     * and will perform all the startup operations.
+     * @return Returns an instance of CaptainKirk
+     * @throws IOException This exception is thrown if something goes wrong while JDroidLib is extracting needed files or performing other IO-ops.
+     * @throws InterruptedException This exception is thrown if JDroidLib encounters an error while performing threaded operations.
+     * @throws OSNotSupportedException This exception is thrown if JDroidLib detects that the host is running a non-supported operating system.
+     */
+    public static CaptainKirk getInstance() throws IOException, InterruptedException, OSNotSupportedException {
+        if (instance != null)
+            return instance;
+        else 
+            return (instance = new CaptainKirk());
+    }
 
     /**
      * Default constructor: Installs ADB/fastboot and gets other data.
@@ -61,7 +78,7 @@ public class CaptainKirk {
      * @throws JDroidLib.exceptions.OSNotSupportedException If JDroi8dLib
      * detects an unsupported OS.
      */
-    public CaptainKirk() throws IOException, ZipException, InterruptedException, OSNotSupportedException {
+    CaptainKirk() throws IOException, InterruptedException, OSNotSupportedException {
         System.out.println("Preparing resources...");
         resMan = new ResourceManager();
         System.out.println("Determining install path for ADB binaries...");
@@ -640,7 +657,7 @@ public class CaptainKirk {
             if (line.trim().isEmpty())/*Ignore empty lines*/ {
                 continue;
             }
-            Device device = new Device(line, controller);
+            Device device = Device.getDevice(line, controller);
             devices.add(device);
         }
 

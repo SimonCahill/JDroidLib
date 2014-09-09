@@ -19,7 +19,6 @@ package JDroidLib.util;
 
 
 import net.lingala.zip4j.core.ZipFile;
-import net.lingala.zip4j.exception.ZipException;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -66,7 +65,7 @@ public class ResourceManager {
      *                             and also
      * @throws InterruptedException if something goes wrong.
      */
-    public void install(OS os, String location) throws IOException, ZipException, InterruptedException, OSNotSupportedException {
+    public void install(OS os, String location) throws IOException, InterruptedException, OSNotSupportedException {
         if (location.equals("Default"))
             if (os == OS.LINUX || os == OS.MAC_OS)
                 new Installer().install(os, new File(System.getProperty("user.home") + "/.jdroidlib/bin/"));
@@ -100,7 +99,7 @@ public class ResourceManager {
      */
     private class Installer {
 
-        public void install(OS os, File location) throws IOException, ZipException, InterruptedException {
+        public void install(OS os, File location) throws IOException, InterruptedException {
             switch (os) {
                 case LINUX:
                     installOnLinux(location);
@@ -123,13 +122,13 @@ public class ResourceManager {
             }
         }
 
-        private void installOnLinux(File location) throws IOException, ZipException, InterruptedException {
+        private void installOnLinux(File location) throws IOException, InterruptedException {
             File installDir = new File(location + "/adb_tools.zip");
             if (!installDir.exists())
                 try {
                     installDir.getParentFile().mkdirs();
-                    InputStream input = this.getClass().getResourceAsStream("/JDroidLib/res/adb_tools/adb.zip");
-                    File adb_tools = new File(location + "/adb_tools.zip");
+                    InputStream input = this.getClass().getResourceAsStream("/JDroidLib/res/adb_tools/adb/adb");
+                    File adb_tools = new File(location + "/adb");
                     OutputStream output = new FileOutputStream(adb_tools);
                     int readBytes = 0;
                     byte[] buffer = new byte[4096];
@@ -138,8 +137,27 @@ public class ResourceManager {
                     }
                     input.close();
                     output.close();
-                    ZipFile zip = new ZipFile(adb_tools);
-                    zip.extractAll(location.toString());
+                    /*# ========== #*/
+                    input = this.getClass().getResourceAsStream("/JDroidLib/res/adb_tools/adb/fastboot");
+                    adb_tools = new File(location + "/fastboot");
+                    output = new FileOutputStream(adb_tools);
+                    readBytes = 0;
+                    buffer = new byte[4096];
+                    while ((readBytes = input.read(buffer)) > 0)
+                        output.write(buffer, 0, readBytes);
+                    input.close();
+                    output.close();
+                    /*# ========== #*/
+                    input = this.getClass().getResourceAsStream("/JDroidLib/res/adb_tools/adb/ddms.jar");
+                    adb_tools = new File(location + "/ddms.jar");
+                    output = new FileOutputStream(adb_tools);
+                    readBytes = 0;
+                    buffer = new byte[4096];
+                    while ((readBytes = input.read(buffer)) > 0)
+                        output.write(buffer, 0, readBytes);
+                    input.close();
+                    output.close();
+                    /*# ========== #*/
                     ProcessBuilder process = new ProcessBuilder("chmod", "a+x", location + "/adb");
                     Process pr = process.start();
                     Thread.sleep(200);
@@ -148,19 +166,18 @@ public class ResourceManager {
                     pr = process.start();
                     Thread.sleep(200);
                     pr.destroy();
-                    adb_tools.delete();
-                } catch (IOException | ZipException | InterruptedException ex) {
+                } catch (IOException | InterruptedException ex) {
                     System.err.println("ERROR: Error while extracting adb_tools in " + location + " on system: Linux\n" + ex.toString());
                     throw ex;
                 }
         }
 
-        private void installOnMac(File location) throws IOException, ZipException, InterruptedException {
+        private void installOnMac(File location) throws IOException, InterruptedException {
             File installDir = new File(location + "/adb_tools.zip");
             if (!installDir.exists()) {
                 installDir.getParentFile().mkdirs();
-                InputStream input = this.getClass().getResourceAsStream("/JDroidLib/res/adb_tools/adb-mac.zip");
-                File adb_tools = new File(location + "/adb_tools.zip");
+                InputStream input = this.getClass().getResourceAsStream("/JDroidLib/res/adb_tools/adb-mac/adb");
+                File adb_tools = new File(location + "/adb");
                 OutputStream output = new FileOutputStream(adb_tools);
                 int readBytes = 0;
                 byte[] buffer = new byte[4096];
@@ -169,8 +186,27 @@ public class ResourceManager {
                 }
                 input.close();
                 output.close();
-                ZipFile zip = new ZipFile(adb_tools);
-                zip.extractAll(location.toString());
+                /*# ========== #*/
+                input = this.getClass().getResourceAsStream("/JDroidLib/res/adb_tools/adb-mac/fastboot");
+                adb_tools = new File(location + "/fastboot");
+                output = new FileOutputStream(adb_tools);
+                readBytes = 0;
+                buffer = new byte[4096];
+                while ((readBytes = input.read(buffer)) > 0)
+                    output.write(buffer, 0, readBytes);
+                input.close();
+                output.close();
+                /*# ========== #*/
+                input = this.getClass().getResourceAsStream("/JDroidLib/res/adb_tools/adb-mac/ddms.jar");
+                adb_tools = new File(location + "/ddms.jar");
+                output = new FileOutputStream(adb_tools);
+                readBytes = 0;
+                buffer = new byte[4096];
+                while ((readBytes = input.read(buffer)) > 0)
+                    output.write(buffer, 0, readBytes);
+                input.close();
+                output.close();
+                /*# ========== #*/
                 ProcessBuilder process = new ProcessBuilder("chmod", "a+x", location + "/adb");
                 Process pr = process.start();
                 Thread.sleep(200);
@@ -179,16 +215,15 @@ public class ResourceManager {
                 pr = process.start();
                 Thread.sleep(200);
                 pr.destroy();
-                adb_tools.delete();
             }
         }
 
-        private void installOnWin(File location) throws IOException, ZipException, InterruptedException {
+        private void installOnWin(File location) throws IOException, InterruptedException {
             File installDir = new File(location + "/adb_tools.zip");
             if (!installDir.exists()) {
                 installDir.getParentFile().mkdirs();
-                InputStream input = this.getClass().getResourceAsStream("/JDroidLib/res/adb_tools/adb-win.zip");
-                File adb_tools = new File(location + "/adb_tools.zip");
+                InputStream input = this.getClass().getResourceAsStream("/JDroidLib/res/adb_tools/adb-win/adb.exe");
+                File adb_tools = new File(location + "/adb.exe");
                 OutputStream output = new FileOutputStream(adb_tools);
                 int readBytes = 0;
                 byte[] buffer = new byte[4096];
@@ -197,8 +232,47 @@ public class ResourceManager {
                 }
                 input.close();
                 output.close();
-                ZipFile zip = new ZipFile(adb_tools);
-                zip.extractAll(location.toString());
+                /*# ========== #*/
+                input = this.getClass().getResourceAsStream("/JDroidLib/res/adb_tools/adb-win/AdbWinApi.dll");
+                adb_tools = new File(location + "/AdbWinApi.dll");
+                output = new FileOutputStream(adb_tools);
+                readBytes = 0;
+                buffer = new byte[4096];
+                while ((readBytes = input.read(buffer)) > 0)
+                    output.write(buffer, 0, readBytes);
+                input.close();
+                output.close();
+                /*# ========== #*/
+                input = this.getClass().getResourceAsStream("/JDroidLib/res/adb_tools/adb-win/AdbWinUsbApi.dll");
+                adb_tools = new File(location + "/AdbWinUsbApi.dll");
+                output = new FileOutputStream(adb_tools);
+                readBytes = 0;
+                buffer = new byte[4096];
+                while ((readBytes = input.read(buffer)) > 0)
+                    output.write(buffer, 0, readBytes);
+                input.close();
+                output.close();
+                /*# ========== #*/
+                input = this.getClass().getResourceAsStream("/JDroidLib/res/adb_tools/adb-win/fastboot.exe");
+                adb_tools = new File(location + "/fastboot.exe");
+                output = new FileOutputStream(adb_tools);
+                readBytes = 0;
+                buffer = new byte[4096];
+                while ((readBytes = input.read(buffer)) > 0)
+                    output.write(buffer, 0, readBytes);
+                input.close();
+                output.close();
+                /*# ========== #*/
+                input = this.getClass().getResourceAsStream("/JDroidLib/res/adb_tools/adb-win/ddms.jar");
+                adb_tools = new File(location + "/ddms.jar");
+                output = new FileOutputStream(adb_tools);
+                readBytes = 0;
+                buffer = new byte[4096];
+                while ((readBytes = input.read(buffer)) > 0)
+                    output.write(buffer, 0, readBytes);
+                input.close();
+                output.close();
+                /*# ========== #*/
                 adb_tools.delete();
             }
         }

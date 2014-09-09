@@ -69,6 +69,20 @@ public final class ADBController {
 
     private CaptainKirk controller = null;
     private FastbootController fbController = null;
+    private static ADBController instance = null;
+    
+    /**
+     * Singleton Function
+     * @return Returns an (and if necessary creates a new) instance of ADBController.
+     * @throws IOException This exception is thrown if something goes wrong while JDroidLib is extracting needed files or performing other IO-ops.
+     * @throws InterruptedException This exception is thrown if JDroidLib encounters an error while performing threaded operations.
+     * @throws OSNotSupportedException This exception is thrown if JDroidLib detects that the host is running a non-supported operating system.
+     */
+    public static ADBController getInstance() throws IOException, InterruptedException, OSNotSupportedException {
+        if (instance != null)
+            return instance;
+        else return (instance = new ADBController());
+    }
 
     /**
      * Retrieves a list of connected devices.
@@ -152,9 +166,9 @@ public final class ADBController {
      * @since beta
      *
      */
-    public ADBController() throws IOException, ZipException, InterruptedException, OSNotSupportedException {
+    ADBController() throws IOException, InterruptedException, OSNotSupportedException {
         System.out.println("Waking Captain Kirk...");
-        controller = new CaptainKirk();
+        controller = CaptainKirk.getInstance();
         System.out.println("Starting ADB server...");
         startServer();
         System.out.append("Preparing JDroidLib for fastboot...");
@@ -328,7 +342,7 @@ public final class ADBController {
      * @param serial
      * @return 
      */
-    public Device getDevice(String serial) { return new Device(serial, this); }
+    public Device getDevice(String serial) { return Device.getDevice(serial, this); }
     
     /**
      * Returns the currently in-use ADB file being used by JDroidLib.

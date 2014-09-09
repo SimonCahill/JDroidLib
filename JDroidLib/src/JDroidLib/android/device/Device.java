@@ -25,52 +25,59 @@ import java.io.*;
 import java.util.*;
 
 /**
- *
+ * Device class. 
+ * This class represents a physical Android device and contains methods which allow you to perform different tasks with any connected Android device.
+ * This class also contains several methods redirecting you to other classes which represent other parts of the Android device.
+ * 
+ * This is a singleton-class.
  * @author beatsleigher
  */
-@SuppressWarnings({"FieldMayBeFinal"})
 public class Device {
 
+    //<editor-fold defaultstate="collapsed" desc="Variables and other boring crap">
     /**
      * Represents the device's SU-installation.
      * @see SU
      */
-    private SU su = null;
+    private final SU su;
     /**
      * Represents the device's busybox-installation.
      * @see BusyBox
      */
-    private BusyBox busybox = null;
+    private final BusyBox busybox;
     /**
      * Represents the device's battery.
      * @see Battery
      */
-    private Battery battery = null;
+    private final Battery battery;
     /**
      * Represents the device's build properties.
      * @see BuildProp
      */
-    private BuildProp buildProp = null;
+    private final BuildProp buildProp;
     /**
      * The device's current state. @see DeviceState.
      */
-    private DeviceState state = null;
+    private DeviceState state;
     /**
      * Represents the device's @see CPU
      */
-    private CPU cpu = null;
+    private final CPU cpu;
     /**
      * The device's serial.
      */
-    private String serial = null;
+    private final String serial;
     /**
      * The @see ADBController instance which powers all the different components here.
      */
-    private ADBController adbController = null;
+    private final ADBController adbController;
     /**
      * The @see FileSystem of the device, which this class represents.
      */
-    private FileSystem fileSystem = null;
+    private final FileSystem fileSystem;
+    
+    private static List<Device> instances = null;
+    //</editor-fold>
 
     /**
      * Constructor for this @see Device-instance.
@@ -78,7 +85,7 @@ public class Device {
      * @param device The serial number of the device to represent.
      * @param adbController An instance of ADBController to use in this class (<b>never creates a new instance of @see ADBController</b>)
      */
-    public Device(String device, ADBController adbController) {
+    Device(String device, ADBController adbController) {
         String[] arr = device.split("\t");
         System.out.println("Device: " + device + ", array length: " + arr.length);
         
@@ -94,6 +101,28 @@ public class Device {
         else
             state = DeviceState.getState(device); 
         fileSystem = new FileSystem(this, adbController);
+    }
+    
+    /**
+     * Queries through an internal list of @see Device instances and checks for previously created instances with the 
+     * serial parameter. If one is found, that @see Device instance will be returned. If no previously created instances match the provided serial,
+     * a new instance is created, added to the list and then returned.
+     * @param serial The serial number of the device. Used to either query for previously created instances or to create a new instance of @see Device.
+     * @param adbController An ADBController instance. Required for the @see Device object to perform different tasks.
+     * @return Returns a @see Device instance.
+     */
+    public static Device getDevice(String serial, ADBController adbController) {
+        if (instances == null)
+            instances = new ArrayList<>();
+        
+        if (!instances.isEmpty())
+            for (Device instance : instances)
+                if (instance.getSerial().equals(serial))
+                    return instance;
+        Device instance = new Device(serial, adbController);
+        instances.add(instance);
+        return instance;
+        
     }
 
     /**
@@ -154,11 +183,18 @@ public class Device {
 
     
     /**
-     * Returns the serial number of the device currently represented by this Device object.
-     * @return (See description)
+     * @return Returns the description of this object with some basic information about the device this object represents (serial #, state, rooted?, battery level)
      */
     @Override
-    public String toString() { return serial; }
+    public String toString() { 
+            try {
+                return String.format("Device. Serial: {0}, State {1}, Is Rooted: {2}, Battery Level: {3}", 
+                             serial, DeviceState.getState(state), String.valueOf(hasRoot()), getBattery().getLevel());
+            } catch (IOException ex) {
+                return String.format("Device. Serial: {0}, State {1}, Is Rooted: {2}, Battery Level: {3}", 
+                             serial, DeviceState.getState(state), "n/a", "n/a");
+            }
+    }
     
     /**
      * Returns an instance of @see PackageController.

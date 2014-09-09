@@ -61,7 +61,7 @@ public class FastbootController {
      * @throws JDroidLib.exceptions.OSNotSupportedException If JDroidLib detects an unsupported OS.
      */
     public FastbootController() throws IOException, ZipException, InterruptedException, OSNotSupportedException {
-        controller = new CaptainKirk();
+        controller = CaptainKirk.getInstance();
     }
 
     /**
