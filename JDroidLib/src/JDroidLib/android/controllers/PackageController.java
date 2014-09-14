@@ -45,8 +45,8 @@ public class PackageController {
      */
     public List<String> listPermissionGroups() throws IOException {
         List<String> permGroups = new ArrayList<>();
-        
-        String output = adbController.executeADBCommand(true, false, device.toString(), new String[]{"pm", "list", "permission-groups"});
+        // new String[]{"pm", "list", "permission-groups"}
+        String output = adbController.executeCommand(device, true, true, "pm", "list", "permission-groups");
         String[] parsed0 = output.split("\n");
         for (String str : parsed0) {
             if (str.toLowerCase().startsWith("permission")) {
@@ -68,7 +68,7 @@ public class PackageController {
         List<String> perms = new ArrayList<>();
         if (!(group == null || group.equals(""))) {
 
-            String output = adbController.executeADBCommand(true, false, device.toString(), new String[]{"pm", "list", "permissions", });
+            String output = adbController.executeCommand(device, true, true, "pm", "list", "permissions", group);
             String[] parsed0 = output.split("\n");
             for (String str : parsed0) {
                 if (!str.toLowerCase().startsWith("all permissions") || str.equals("")) {
@@ -92,26 +92,23 @@ public class PackageController {
         List<String> instrumentation = new ArrayList<>();
         
         String[] args = new String[10];
-        args[0] = "pm";
-        args[1] = "list";
-        args[2] = "instrumentation";
+        args[0] = "list";
+        args[1] = "instrumentation";
         if (!apk.equals("") || apk != null) {
-            args[3] = "-f";
-            args[4] = apk;
+            args[2] = "-f";
+            args[3] = apk;
             if (!(testPackage.equals("") || testPackage == null)) 
-                args[5] = testPackage;
+                args[4] = testPackage;
         } else {
             if (!(testPackage.equals("") || testPackage == null)) 
-                args[3] = testPackage;
+                args[2] = testPackage;
         }
         
-        String output = adbController.executeADBCommand(true, false, device.toString(), args);
+        String output = adbController.executeCommand(device, true, true, "pm", "list", "instrumentation");
         if (!output.equals("")) {
             String[] parsed0 = output.split("\n");
 
-            for (String str : parsed0) {
-                instrumentation.add(str);
-            }
+            instrumentation.addAll(Arrays.asList(parsed0));
             
             return instrumentation;
         }
@@ -127,7 +124,7 @@ public class PackageController {
     public List<String> getFeatures() throws IOException {
         List<String> features = new ArrayList<>();
         
-        String output = adbController.executeADBCommand(true, false, device.toString(), new String[]{"pm", "list", "features"});
+        String output = adbController.executeCommand(device, true, true, "pm", "list", "features");
         String[] parsed0 = output.split("\n");
         
         for (String str : parsed0) {
@@ -146,7 +143,7 @@ public class PackageController {
     public List<String> getLibs() throws IOException {
         List<String> libs = new ArrayList<>();
         
-        String output = adbController.executeADBCommand(true, false, device.toString(), new String[]{"pm", "list", "libraries"});
+        String output = adbController.executeCommand(device, true, true, "pm", "list", "libraries");
         String[] parsed0 = output.split("\n");
         
         for (String str : parsed0) {
@@ -165,12 +162,10 @@ public class PackageController {
     public List<String> getUsers() throws IOException {
         List<String> users = new ArrayList<>();
         
-        String output = adbController.executeADBCommand(true, false, device.toString(), new String[]{"pm", "list", "users"});
+        String output = adbController.executeCommand(device, true, true, "pm", "pm", "list", "users");
         String[] parsed0 = output.split("\n");
         
-        for (String str : parsed0) {
-            users.add(str);
-        }
+        users.addAll(Arrays.asList(parsed0));
         
         return users;
     }
@@ -182,7 +177,7 @@ public class PackageController {
      * @throws IOException 
      */
     public String getPathOfAPK(String apk) throws IOException {
-        return adbController.executeADBCommand(true, false, device.toString(), new String[]{"pm", "path", apk});
+        return adbController.executeCommand(device, true, true, "pm", "path", apk);
     }
     
     /**
@@ -192,7 +187,7 @@ public class PackageController {
      * @throws IOException 
      */
     public String getAPKDump(String apk) throws IOException {
-        return adbController.executeADBCommand(true, false, device.toString(), new String[]{"pm", "dump", apk});
+        return adbController.executeCommand(device, true, true, "pm", "dump", apk);
     }
     
     /**
@@ -208,9 +203,10 @@ public class PackageController {
      * @throws IOException If something goes wrong.
      */
     public String installApplication
-        (boolean forwardLock, boolean reinstall, boolean allowTestApps, String APK, boolean installToSDCard, boolean installToInternalFlash, boolean allowDowngrade) throws IOException {
+        (boolean forwardLock, boolean reinstall, boolean allowTestApps, String APK, boolean installToSDCard, boolean installToInternalFlash, boolean allowDowngrade) 
+                throws IOException {
             List<String> args = new ArrayList<>();
-            args.add("pm");
+            String[] _args = new String[1024];
             args.add("install");
             if (forwardLock)
                 args.add("-l");
@@ -226,8 +222,10 @@ public class PackageController {
                 args.add("-f");
             if (allowDowngrade)
                 args.add("-d");
+            for (int i = 0; i < args.size(); i++)
+                _args[i] = args.get(i);
                 
-            return adbController.executeADBCommand(true, false, device, args);
+            return adbController.executeCommand(device, true, true, "pm", _args);
         }
         
     /**
@@ -239,15 +237,14 @@ public class PackageController {
      */
     public String uninstallApplication(boolean keepData, String _package) throws IOException {
         String[] args = new String[10];
-        args[0] = "pm";
-        args[1] = "uninstall";
+        args[0] = "uninstall";
         if (keepData) {
-            args[2] = "-k";
-            args[3] = _package;
-        } else {
+            args[1] = "-k";
             args[2] = _package;
+        } else {
+            args[3] = _package;
         }
-        return adbController.executeADBCommand(true, false, device.toString(), args);
+        return adbController.executeCommand(device, true, true, "pm", args);
     }
     
     /**
@@ -259,16 +256,15 @@ public class PackageController {
      */
     public String clearData(String userID, String _package) throws IOException {
         String[] args = new String[10];
-        args[0] = "pm";
-        args[1] = "clear";
+        args[0] = "clear";
         if (!userID.equals("") || userID != null) {
-            args[2] = "--user";
-            args[3] = userID;
-            args[4] = _package;
+            args[1] = "--user";
+            args[2] = userID;
+            args[3] = _package;
         } else {
-            args[2] = _package;
+            args[1] = _package;
         }
-        return adbController.executeADBCommand(true, false, device.toString(), args);
+        return adbController.executeCommand(device, true, true, "pm", args);
     }
     
     /**
@@ -280,17 +276,16 @@ public class PackageController {
      */
     public String enableComponent(String userID, String component) throws IOException {
         String[] args = new String[10];
-        args[0] = "pm";
-        args[1] = "enable";
+        args[0] = "enable";
         if (!(userID.equals("") || userID == null)) {
-            args[2] = "--user";
-            args[3] = userID;
-            args[4] = component;
+            args[1] = "--user";
+            args[2] = userID;
+            args[3] = component;
         } else {
-            args[2] = component;
+            args[1] = component;
         }
         
-        return adbController.executeADBCommand(true, false, device.toString(), args);
+        return adbController.executeCommand(device, true, true, "pm", args);
     }
     
     /**
@@ -302,17 +297,16 @@ public class PackageController {
      */
     public String disableComponent(String userID, String component) throws IOException {
         String[] args = new String[10];
-        args[0] = "pm";
-        args[1] = "disable";
+        args[0] = "disable";
         if (!(userID.equals("") || userID == null)) {
-            args[2] = "--user";
-            args[3] = userID;
-            args[4] = component;
+            args[1] = "--user";
+            args[2] = userID;
+            args[3] = component;
         } else {
-            args[2] = component;
+            args[4] = component;
         }
         
-        return adbController.executeADBCommand(true, false, device.toString(), args);
+        return adbController.executeCommand(device, true, true, "pm", args);
     }
     
     /**
@@ -326,8 +320,7 @@ public class PackageController {
         if ((_package.equals("") || _package == null) || (permission.equals("") || permission == null))
             return null;
         
-        String[] args = {"pm", "grant", _package, permission};
-        return adbController.executeADBCommand(true, false, device.toString(), args);
+        return adbController.executeCommand(device, true, true, "pm", "grant", _package, permission);
     }
     
     /**
@@ -341,8 +334,7 @@ public class PackageController {
         if ((_package.equals("") || _package == null) || (permission.equals("") || permission == null))
             return null;
         
-        String[] args = {"pm", "revoke", _package, permission};
-        return adbController.executeADBCommand(true, false, device.toString(), args);
+        return adbController.executeCommand(device, true, true, "pm", "revoke", _package, permission);
     }
     
     /**
@@ -355,7 +347,7 @@ public class PackageController {
         if (userName.equals("") || userName == null)
             return null;
         
-        return adbController.executeADBCommand(true, false, device.toString(), new String[]{"pm", "create-user", userName});
+        return adbController.executeCommand(device, true, true, "pm", "create-user", userName);
     }
     
     /**
@@ -368,7 +360,7 @@ public class PackageController {
         if (userID.equals("") || userID == null)
             return null;
         
-        return adbController.executeADBCommand(true, false, device.toString(), new String[]{"pm", "remove-user", userID});
+        return adbController.executeCommand(device, true, true, "pm", "remove-user", userID);
     }
     
     /**
@@ -377,9 +369,8 @@ public class PackageController {
      * @throws IOException If something goes wrong.
      */
     public long getMaxUserCount() throws IOException {
-        String output = adbController.executeADBCommand(true, false, device.toString(), new String[]{"pm", "get-max-users"});
-        String[] maxAmount = output.split(": ");
-        return Long.valueOf(maxAmount[1]);
+        String output = adbController.executeCommand(device, true, true, "pm", "get-max-users");
+        return Long.valueOf(output.split(": ")[1]);
     }
     
     /**
@@ -388,12 +379,11 @@ public class PackageController {
      * @throws IOException If something goes wrong.
      */
     public List<String> getPackages() throws IOException {
-        String output = adbController.executeADBCommand(true, false, device.toString(), new String[]{"pm", "list", "packages"});
+        String output = adbController.executeCommand(device, true, true, "pm", "list", "packages");
         String[] packages = output.split("\n");
         List<String> packageList = new ArrayList<>();
         
-        for (String str : packages)
-            packageList.add(str);
+        packageList.addAll(Arrays.asList(packages));
         
         return packageList;
     }

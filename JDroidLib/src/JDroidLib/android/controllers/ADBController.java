@@ -162,6 +162,18 @@ public final class ADBController {
         startServer();
     }
     
-    
+    /**
+     * Attempts to restart the running ADB server into root mode.
+     * @throws IOException If something goes wrong during process execution.
+     * @throws ServerAlreadyRootedException If the server is already running as root.
+     */
+    public void rootServer() throws IOException, ServerAlreadyRootedException {
+        String rawOutput = 
+                controller.executeCommand(Command.getAnonymousCommand(Command.CommandType.ANONYMOUS_COMMAND, Command.convertArrayToList("root"), true, true));
+        
+        if (rawOutput.toLowerCase().contains("already"))
+            throw new ServerAlreadyRootedException(rawOutput);
+        
+    }
 
 }
