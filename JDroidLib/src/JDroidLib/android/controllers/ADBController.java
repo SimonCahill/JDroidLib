@@ -16,15 +16,13 @@
  */
 package JDroidLib.android.controllers;
 
-import net.lingala.zip4j.exception.ZipException;
-
 import java.io.*;
 import java.util.*;
 
-import JDroidLib.android.device.Device;
-import JDroidLib.enums.RebootTo;
 import JDroidLib.exceptions.*;
 import JDroidLib.util.CaptainKirk;
+import JDroidLib.android.device.*;
+import JDroidLib.util.*;
 
 /**
  * JDroidLib's main class.
@@ -67,8 +65,7 @@ import JDroidLib.util.CaptainKirk;
 @SuppressWarnings({"MismatchedQueryAndUpdateOfCollection", "UnusedAssignment", "StringConcatenationInsideStringBufferAppend", "ConvertToTryWithResources"})
 public final class ADBController {
 
-    private CaptainKirk controller = null;
-    private FastbootController fbController = null;
+    private final CaptainKirk controller;
     private static ADBController instance = null;
     
     /**
@@ -85,7 +82,86 @@ public final class ADBController {
     }
 
     private ADBController() throws IOException, InterruptedException, OSNotSupportedException {
-        
+        controller = CaptainKirk.getInstance();
     }
+    
+    /**
+     * Parses ADB output and creates a list of device objects, which represents the devices connected to the computer.
+     * @return A list of device object. Each @see Device in the list represents a physical (or virtual/emulator) device connected to the computer.
+     * @throws IOException If something goes wrong during the execution of the command.
+     */
+    public List<Device> getConnectedDevices() throws IOException {
+        List<Device> devices = new ArrayList<>();
+        String rawOutput;
+        String line;
+        BufferedReader reader;
+        
+        rawOutput = controller.executeCommand(Command.getAnonymousCommand(Command.CommandType.ANONYMOUS_COMMAND, Command.convertArrayToList("devices"), true, true));
+        
+        reader = new BufferedReader(new StringReader(rawOutput));
+        while ((line = reader.readLine()) != null) {
+            if (line.toLowerCase().contains("list")) continue;
+            if (line.isEmpty()) continue;
+            
+            devices.add(Device.getDevice(line.split("\\s")[0], this));
+        }
+        reader.close();
+        
+        return devices;
+    }
+    
+    /**
+     * Executes a given command and either returns the output or an empty string.
+     * @param device The device to issue the command to.
+     * @param asShell If you wish to execute a <u>shell</u> command, set to true.
+     * @param returnOutput Set to <i>true</i> if the the process' output should be returned.
+     * @param executable The executable on the device to start. (E.G.: su)
+     * @param params The executable's parameters.
+     * @return If returnOutput is set to <i>true</i>, the process' output will be returned.
+     * @throws IOException If something goes wrong during command/process execution.
+     * @throws IllegalArgumentException If one or more arguments are illegal/faulty.
+     */
+    public String executeCommand(Device device, boolean asShell, boolean returnOutput, String executable, String... params) throws IOException, IllegalArgumentException {
+        if (device == null)
+            throw new IllegalArgumentException("device must not be null!");
+        if (executable == null || executable.isEmpty())
+            throw new IllegalArgumentException("executable must not be null or empty!");
+        if (params == null || params.length == 0)
+            throw new IllegalArgumentException("params must not be null or empty!");
+        
+        List<String> cmd_param = new ArrayList<>();
+        cmd_param.add("shell");
+        cmd_param.add(executable);
+        cmd_param.addAll(Arrays.asList(params));
+        
+        return controller.executeCommand(Command.getCommand(Command.CommandType.ADB_COMMAND, device.getSerial(), cmd_param, returnOutput));
+    }
+    
+    /**
+     * Starts the ADB server.
+     * @throws IOException If something goes wrong during process execution.
+     */
+    public void startServer() throws IOException {
+        controller.executeCommand(Command.getAnonymousCommand(Command.CommandType.ANONYMOUS_COMMAND, Command.convertArrayToList("start-server"), false, true));
+    }
+    
+    /**
+     * Stops a running ADB server.
+     * @throws IOException If something goes wrong during process execution.
+     */
+    public void stopServer() throws IOException {
+        controller.executeCommand(Command.getAnonymousCommand(Command.CommandType.ANONYMOUS_COMMAND, Command.convertArrayToList("stop-server"), false, true));
+    }
+    
+    /**
+     * Restarts the running ADB server.
+     * @throws IOException If something goes wrong during process execution.
+     */
+    public void restartServer() throws IOException {
+        stopServer();
+        startServer();
+    }
+    
+    
 
 }
