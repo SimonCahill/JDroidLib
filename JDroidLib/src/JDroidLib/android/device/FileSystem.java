@@ -48,24 +48,18 @@ public class FileSystem {
      * @param useBusybox Use Busybox for advanced listing (recommended)
      * @return list of files and folders.
      * @throws IOException if something goes wrong.
+     * @throws JDroidLib.exceptions.ServerAlreadyRootedException
      */
-    public List<String> list(String location, boolean useBusybox) throws IOException {
+    public List<String> list(String location, boolean useBusybox) throws IOException, ServerAlreadyRootedException {
         List<String> listOfFiles = new ArrayList();
-        List<String> args = new ArrayList<>();
        
         adbController.rootServer();
         
         if (useBusybox && device.getBusybox().isInstalled()) {
             String output = null;
             String line = null;
-            args.add("busybox");
-            args.add("ls");
-            args.add("-a");
-            args.add("-p");
-            args.add("-1");
-            args.add(location);
             
-            output = adbController.executeADBCommand(true, true, device, args);
+            output = adbController.executeCommand(device, true, true, "busybox", "ls", "-a", "-p", "-l", location);
             
             BufferedReader reader = new BufferedReader(new StringReader(output));
             while ((line = reader.readLine()) != null) {
@@ -76,11 +70,8 @@ public class FileSystem {
         } else {
             String output = null;
             String line = null;
-            args.add("ls");
-            args.add("-a");
-            args.add(location);
             
-            output = adbController.executeADBCommand(true, true, device, args);
+            output = adbController.executeCommand(device, true, true, "ls", "-a", location);
             
             BufferedReader reader = new BufferedReader(new StringReader(output));
             while ((line = reader.readLine()) != null) {
@@ -99,8 +90,8 @@ public class FileSystem {
      * @throws IOException If something goes wrong.
      * @throws DeleteFailedException Obsolete.
      */
-    public String delete(String file) throws IOException, DeleteFailedException {
-        return adbController.executeADBCommand(true, true, device, new String[]{"rm", file});
+    public String delete(String file) throws IOException {
+        return adbController.executeCommand(device, true, true, "rm", file);
     }
     
     /**
@@ -109,8 +100,9 @@ public class FileSystem {
      * @param name The name of the folder.
      * @return ADB's output
      * @throws IOException If something goes wrong.
+     * @throws JDroidLib.exceptions.ServerAlreadyRootedException
      */
-    public String mkDir(String location, String name) throws IOException {
+    public String mkDir(String location, String name) throws IOException, ServerAlreadyRootedException {
         
         if (location == null || location.equals(""))
             throw new NullPointerException("No location was specified!");
@@ -131,7 +123,7 @@ public class FileSystem {
         adbController.rootServer();
         
         try {
-        adbOutput = adbController.executeADBCommand(true, true, device, new String[]{"mkdir", location + name});
+        adbOutput = adbController.executeCommand(device, true, true, "mkdir", location + name);
         } finally {
             if (!adbOutput.equals(""))
                 returnVal = adbOutput;
@@ -148,8 +140,9 @@ public class FileSystem {
      * @param name The name of the new file.
      * @return ADB's output
      * @throws IOException If something goes wrong.
+     * @throws JDroidLib.exceptions.ServerAlreadyRootedException
      */
-    public String touch(String location, String name) throws IOException {
+    public String touch(String location, String name) throws IOException, ServerAlreadyRootedException {
         
         if (location == null || location.equals(""))
             throw new NullPointerException("No location was specified!");
@@ -169,7 +162,7 @@ public class FileSystem {
         adbController.rootServer();
         
         try {
-            adbOutput = adbController.executeADBCommand(true, true, device, new String[]{"touch", location + name});
+            adbOutput = adbController.executeCommand(device, true, true, "touch", location + name);
         } finally {
             if (!adbOutput.equals(""))
                 returnVal = adbOutput;
@@ -187,8 +180,9 @@ public class FileSystem {
      * @param dest The destination folder.
      * @return ADB'S output.
      * @throws IOException 
+     * @throws JDroidLib.exceptions.ServerAlreadyRootedException 
      */
-    public String pull(String source, File dest) throws IOException {
+    public String pull(String source, File dest) throws IOException, ServerAlreadyRootedException {
         String returnVal = null;
         String adbOutput = null;
         
@@ -202,7 +196,7 @@ public class FileSystem {
         adbController.rootServer();
         
         try {
-            adbOutput = adbController.executeADBCommand(false, true, device, new String[]{"pull", source, dest.getAbsolutePath()});
+            adbOutput = adbController.executeCommand(device, false, true, "pull", source, dest.getAbsolutePath());
         } finally {
             if (adbOutput != null || !adbOutput.equals(""))
                 returnVal = adbOutput;
@@ -219,8 +213,9 @@ public class FileSystem {
      * @param dest The destination folder on the device.
      * @return ADB's output.
      * @throws IOException If something goes wrong.
+     * @throws JDroidLib.exceptions.ServerAlreadyRootedException
      */
-    public String push(File source, String dest) throws IOException {
+    public String push(File source, String dest) throws IOException, ServerAlreadyRootedException {
         String returnVal = null;
         String adbOutput = null;
         
@@ -232,7 +227,7 @@ public class FileSystem {
         adbController.rootServer();
         
         try {
-            adbOutput = adbController.executeADBCommand(false, true, device, new String[]{"pull", source.getAbsolutePath(), dest});
+            adbOutput = adbController.executeCommand(device, false, true, "pull", source.getAbsolutePath(), dest);
         } finally {
             if (adbOutput != null || !adbOutput.equals(""))
                 returnVal = adbOutput;

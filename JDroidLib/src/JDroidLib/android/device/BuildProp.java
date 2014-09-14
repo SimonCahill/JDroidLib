@@ -18,8 +18,9 @@
 package JDroidLib.android.device;
 
 import JDroidLib.enums.RebootTo;
-import JDroidLib.exceptions.PropertyNotFoundException;
+import JDroidLib.exceptions.*;
 import JDroidLib.android.controllers.ADBController;
+import JDroidLib.enums.*;
 
 import java.io.*;
 
@@ -76,7 +77,7 @@ public class BuildProp {
      * @throws IOException 
      */
     public String getProp() throws IOException {
-        String output = adbController.executeADBCommand(true, false, device, new String[]{"getprop"});
+        String output = adbController.executeCommand(device, true, true, "getprop");
         String toReturn = "";
         BufferedReader reader = new BufferedReader(new StringReader(output));
         String line = "";
@@ -121,9 +122,9 @@ public class BuildProp {
      * @throws IOException if something went wrong.
      */
     public void setProp(String key, String value, boolean rebootAfter) throws IOException {
-        adbController.executeADBCommand(true, false, device, new String[]{"setprop", key, value});
+        adbController.executeCommand(device, true, true, "setprop", key, value);
         if (rebootAfter)
-            adbController.rebootDevice(device, RebootTo.ANDROID);
+            device.reboot(DeviceState.DEVICE);
     }
     
     /**
@@ -132,8 +133,8 @@ public class BuildProp {
      * @throws IOException if something goes wrong.
      */
     public void pullProp(String dest) throws IOException {
-        String[] commands = {"pull", "/system/build.prop", dest + "/build.prop"};
-        String str = adbController.executeADBCommand(false, false, device, commands);
+        String[] commands = {"/system/build.prop", dest + "/build.prop"};
+        adbController.executeCommand(device, false, false, "pull", commands);
         propFile = dest + "/build.prop";
     }
     
@@ -143,8 +144,7 @@ public class BuildProp {
      * @throws IOException if something went wrong.
      */
     public void pushProp(String prop) throws IOException {
-        String[] commands = {"push", prop, "/System/"};
-        adbController.executeADBCommand(false, true, device, commands);
+        adbController.executeCommand(device, false, false, "push", prop, "/System/");
     }
     
 }

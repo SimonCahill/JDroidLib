@@ -21,7 +21,6 @@ import JDroidLib.android.controllers.ADBController;
 import JDroidLib.exceptions.*;
 
 import java.io.*;
-import java.util.*;
 
 /**
  * Represents a device's SuperUser installation.
@@ -51,8 +50,7 @@ public class SU {
      * @throws IOException If an error occurs while executing the ADB commands.
      */
     private void update() throws IOException {
-        String[] cmd = {"su", "-v"};
-        String raw = adbController.executeADBCommand(true, false, device, cmd);
+        String raw = adbController.executeCommand(device, true, true, "su", "-v");
         BufferedReader reader = new BufferedReader(new StringReader(raw));
         String line = "";
         while ((line = reader.readLine()) != null) {
@@ -99,16 +97,13 @@ public class SU {
      * @throws JDroidLib.exceptions.DeviceHasNoRootException if the device does <i>not</i> have root.
      */
     public String executeSUCommand(boolean remount, String[] cmds) throws IOException, DeviceHasNoRootException {
-        
         if (!hasRoot())
-            throw new DeviceHasNoRootException("Cannot execute root commands without root access. Nitwhit, you :D");
+            throw new DeviceHasNoRootException("Cannot execute root commands without root access.");
         
-        List<String> args = new ArrayList<>();
-        if (!cmds[0].equals("su"))
-            args.add("su");
-        args.addAll(Arrays.asList(cmds));
+        if (remount)
+            device.remountDevice();
         
-        return adbController.executeADBCommand(true, remount, device, args);
+        return adbController.executeCommand(device, true, true, "su", cmds);
     }
     
 }

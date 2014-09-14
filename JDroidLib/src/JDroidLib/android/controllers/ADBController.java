@@ -126,15 +126,30 @@ public final class ADBController {
             throw new IllegalArgumentException("device must not be null!");
         if (executable == null || executable.isEmpty())
             throw new IllegalArgumentException("executable must not be null or empty!");
-        if (params == null || params.length == 0)
-            throw new IllegalArgumentException("params must not be null or empty!");
         
         List<String> cmd_param = new ArrayList<>();
-        cmd_param.add("shell");
+        if (asShell)
+            cmd_param.add("shell");
         cmd_param.add(executable);
         cmd_param.addAll(Arrays.asList(params));
         
         return controller.executeCommand(Command.getCommand(Command.CommandType.ADB_COMMAND, device.getSerial(), cmd_param, returnOutput));
+    }
+    
+    /**
+     * Executes a given command and either returns the output or an empty string.
+     * @param returnOutput Set to <i>true</i> if the the process' output should be returned.
+     * @param executable The executable on the device to start. (E.G.: su)
+     * @param params The executable's parameters.
+     * @return If returnOutput is set to <i>true</i>, the process' output will be returned.
+     * @throws IOException If something goes wrong during command/process execution.
+     * @throws IllegalArgumentException If one or more arguments are illegal/faulty.
+     */
+    public String executeCommand(boolean returnOutput, String executable, String... params) throws IOException, IllegalArgumentException {
+        List<String> commands = new ArrayList<>();
+        commands.add(executable);
+        commands.addAll(Arrays.asList(params));
+        return controller.executeCommand(Command.getAnonymousCommand(Command.CommandType.ANONYMOUS_COMMAND, commands, returnOutput, true));
     }
     
     /**

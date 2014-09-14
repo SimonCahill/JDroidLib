@@ -45,8 +45,7 @@ public class BusyBox {
      * @throws IOException If an error occurs while executing ADB commands.
      */
     private void update() throws IOException {
-        String[] cmd = {"busybox"};
-        String raw = adbController.executeADBCommand(true, false, device, cmd);
+        String raw = adbController.executeCommand(device, true, true, "busybox");
         BufferedReader reader = new BufferedReader(new StringReader(raw));
         String line = "";
         while ((line = reader.readLine()) != null) {
@@ -56,7 +55,7 @@ public class BusyBox {
                 break;
             } else if (line.startsWith("BusyBox")) {
                 isInstalled = true;
-                String[] arr = line.split("\\ ");
+                String[] arr = line.split("\\s");
                 busyboxVersion = arr[1];
                 break;
             }

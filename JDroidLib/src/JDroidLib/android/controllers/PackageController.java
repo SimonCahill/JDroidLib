@@ -19,6 +19,7 @@ package JDroidLib.android.controllers;
 
 
 import JDroidLib.android.device.*;
+import JDroidLib.interfaces.*;
 
 import java.io.*;
 import java.util.*;
@@ -28,7 +29,7 @@ import java.util.*;
  *
  * @author beatsleigher
  */
-public class PackageController {
+public class PackageController implements Disposeable {
     
     private Device device = null;
     private ADBController adbController = null;
@@ -386,6 +387,12 @@ public class PackageController {
         packageList.addAll(Arrays.asList(packages));
         
         return packageList;
+    }
+
+    @Override
+    public void dispose() {
+        device = null;
+        adbController = null;
     }
     
 }

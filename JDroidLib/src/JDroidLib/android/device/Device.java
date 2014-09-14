@@ -132,7 +132,7 @@ public class Device {
      */
     public DeviceState getState() throws IOException {
         state = DeviceState.UNKNOWN;
-        String output = adbController.executeADBCommand(false, false, serial, new String[]{"devices"});
+        String output = adbController.executeCommand(true, "devices");
         BufferedReader reader = new BufferedReader(new StringReader(output));
         String line = "";
         while ((line = reader.readLine()) != null)
@@ -210,10 +210,7 @@ public class Device {
      * @throws NullPointerException ^
      */
     public boolean installApplication(String apk) throws IOException, NullPointerException {
-        List<String> args = new ArrayList<>();
-        args.add("install");
-        args.add(apk);
-        String output = adbController.executeADBCommand(false, false, this, args);
+        String output = adbController.executeCommand(this, false, true, "install", apk);
         BufferedReader reader = new BufferedReader(new StringReader(output));
         String line = null;
         while ((line = reader.readLine()) != null) {
@@ -230,17 +227,17 @@ public class Device {
      * @throws JDroidLib.exceptions.InvalidModeException If the requested reboot is not available
      * 
      */
-    public void reboot(DeviceState stateToBootInto) throws IOException, InvalidModeException {
+    public void reboot(DeviceState stateToBootInto) throws IOException {
         if (stateToBootInto == null)
-            throw new NullPointerException("Invalid parameter: stateToBooInto must not be null!");
+            throw new IllegalArgumentException("Invalid parameter: stateToBootInto must not be null!");
         
         if (stateToBootInto == DeviceState.BOOTLOADER || stateToBootInto == DeviceState.FASTBOOT || stateToBootInto == DeviceState.RECOVERY || stateToBootInto == DeviceState.DEVICE) {
             if (stateToBootInto == DeviceState.DEVICE) {
-                adbController.executeADBCommand(false, false, this, new String[]{"reboot"});
+                adbController.executeCommand(this, false, true, "reboot");
                 return;
             }
-            adbController.executeADBCommand(false, false, this, new String[]{"reboot", DeviceState.getState(stateToBootInto)});
-        } else throw new InvalidModeException("The requested reboot-mode is not vald. Requested mode: " + stateToBootInto);
+            adbController.executeCommand(this, false, true,"reboot", DeviceState.getState(stateToBootInto));
+        } else throw new IllegalArgumentException("The requested reboot-mode is not vald. Requested mode: " + stateToBootInto);
     }
 
     /**
@@ -255,5 +252,13 @@ public class Device {
      * @return @see FileSystem
      */
     public FileSystem getFileSystem() { return fileSystem; }
+    
+    /**
+     * Remounts the device's filesystem, so files can be pushed and pulled to and from the filesystem.
+     * @throws IOException If something goes wrong during process execution.
+     */
+    public void remountDevice() throws IOException {
+        adbController.executeCommand(this, false, false, "remount");
+    }
     
 }

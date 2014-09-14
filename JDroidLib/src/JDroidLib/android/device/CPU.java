@@ -51,8 +51,7 @@ public class CPU {
      * @throws IOException 
      */
     private void update() throws IOException {
-        String[] cmd = {"dumpsys", "cpuinfo"};
-        String raw = adbController.executeADBCommand(true, false, device, cmd);
+        String raw = adbController.executeCommand(device, true, true, "dumpsys", "cpuinfo");
         BufferedReader reader = new BufferedReader(new StringReader(raw));
         String line = "";
         cpuUsage.clear();

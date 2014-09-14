@@ -20,7 +20,6 @@ package JDroidLib.android.device;
 import JDroidLib.android.controllers.ADBController;
 
 import java.io.*;
-import java.util.*;
 
 /**
  * Represents a device's battery.
@@ -218,8 +217,7 @@ public class Battery {
      * @throws IOException If an error occurs while executing the ADB process.
      */
     private void update() throws IOException {
-        String[] commands = {"dumpsys", "battery"};
-        String raw = adbController.executeADBCommand(true, false, device, commands);
+        String raw = adbController.executeCommand(device, true, true, "dumpsys", "battery");
         BufferedReader reader = new BufferedReader(new StringReader(raw));
             String line = "";
             while ((line = reader.readLine()) != null) {
