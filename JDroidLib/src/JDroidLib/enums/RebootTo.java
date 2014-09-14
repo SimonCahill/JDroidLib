@@ -25,11 +25,7 @@ public enum RebootTo {
     /**
      * Reboot the device to Android OS.
      */
-    ANDROID, 
-    /**
-     * Reboot the device to recovery mode.
-     */
-    RECOVERY, 
+    ANDROID,
     /**
      * Reboot the device to its respective bootloader.
      */

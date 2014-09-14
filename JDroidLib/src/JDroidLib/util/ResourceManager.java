@@ -50,6 +50,8 @@ public class ResourceManager {
     private File adb = null;
     private File fastboot = null;
     private File backupDir = null;
+    
+    ResourceManager() {}
 
     /**
      * Installs ADB to system. Is called by ADBController or CaptainKirk by
@@ -66,7 +68,7 @@ public class ResourceManager {
      * @throws InterruptedException if something goes wrong.
      */
     public void install(OS os, String location) throws IOException, InterruptedException, OSNotSupportedException {
-        if (location.equals("Default"))
+        if (location.toLowerCase().equals("default"))
             if (os == OS.LINUX || os == OS.MAC_OS)
                 new Installer().install(os, new File(System.getProperty("user.home") + "/.jdroidlib/bin/"));
             else if (os == OS.WINDOWS)

@@ -19,12 +19,11 @@ package JDroidLib.android.controllers;
 
 import JDroidLib.enums.RebootTo;
 import JDroidLib.exceptions.*;
+import JDroidLib.util.*;
 import JDroidLib.util.CaptainKirk;
 
 import java.io.*;
 import java.util.*;
-
-import net.lingala.zip4j.exception.ZipException;
 
 /**
  * FastbootController - The right way to do anything fastboot.
@@ -37,30 +36,21 @@ import net.lingala.zip4j.exception.ZipException;
 public class FastbootController {
 
     CaptainKirk controller = null;
-
+    static FastbootController instance = null;
+    
     /**
-     * Recommended constructor. Always used by ADBController, use method @see
-     * #code ADBController.getFastbootController() to get an instance of this
-     * class.
-     *
-     * @param controller
+     * Returns an existing or creates and returns an instance of FastbootController.
+     * @return An instance of Fastboot controller.
+     * @throws IOException If an error occurs during instantiation.
+     * @throws InterruptedException If an error occurs during instantiation.
+     * @throws OSNotSupportedException If an error occurs during instantiation.
      */
-    public FastbootController(CaptainKirk controller) {
-        this.controller = controller;
+    public static FastbootController getFastbootController() throws IOException, InterruptedException, OSNotSupportedException {
+        if (instance != null) return instance; 
+        else return (instance = new FastbootController()); 
     }
-
-    /**
-     * Emergency constructor. This constructor will attempt to install ADB and
-     * fastboot, and will cause problems when ADBController is in use. Unless
-     * your program is specifically designed to work <i>only</i> with fastboot,
-     * use @see {ADBController.getFastbootController()}.
-     *
-     * @throws IOException
-     * @throws ZipException
-     * @throws InterruptedException
-     * @throws JDroidLib.exceptions.OSNotSupportedException If JDroidLib detects an unsupported OS.
-     */
-    public FastbootController() throws IOException, ZipException, InterruptedException, OSNotSupportedException {
+    
+    private FastbootController() throws IOException, InterruptedException, OSNotSupportedException {
         controller = CaptainKirk.getInstance();
     }
 
@@ -68,14 +58,44 @@ public class FastbootController {
      * Allows for execution of custom fastboot commands, used for data
      * capsuling.
      *
-     * @param deviceSerial for device-specific commands. Set to null, if not
-     * device specific.
-     * @param cmds you want to execute.
-     * @return fastboot output.
+     * @param deviceSerial The serial of the device you wish to issue the command to.
+     * @param cmds A list of commands (and/or) parameters you'd like to execute.
+     * @param returnOutput Set to true if you want to process the command's output manually.
+     * @return If returnOutput is set to <u>true</u>, the fastboot command's output will be returned.
      * @throws IOException if something went wrong.
      */
-    public String executeFastbootCommand(String deviceSerial, String[] cmds) throws IOException {
-        return controller.executeFastbootCommand(deviceSerial, cmds);
+    public String executeCommand(String deviceSerial, String[] cmds, boolean returnOutput) throws IOException, IllegalArgumentException {
+        if (deviceSerial == null || deviceSerial.isEmpty())
+            throw new IllegalArgumentException("deviceSerial must not be null or empty!");
+        if (cmds == null || cmds.length == 0)
+            throw new IllegalArgumentException("cmds must not be null or empty!");
+        
+        if (returnOutput)
+            return controller.executeCommand(Command.getCommand(Command.CommandType.FASTBOOT_COMMAND, deviceSerial, Command.convertArrayToList(cmds), true));
+        else
+            return null;
+    }
+    
+    /**
+     * Allows for execution of custom fastboot commands, used for data
+     * capsuling.
+     *
+     * @param deviceSerial The serial of the device you wish to issue the command to.
+     * @param cmds A list of commands (and/or) parameters you'd like to execute.
+     * @param returnOutput Set to true if you want to process the command's output manually.
+     * @return If returnOutput is set to <u>true</u>, the fastboot command's output will be returned.
+     * @throws IOException if something went wrong.
+     */
+    public String executeCommand(String deviceSerial, List<String> cmds, boolean returnOutput) throws IOException {
+        if (deviceSerial == null || deviceSerial.isEmpty())
+            throw new IllegalArgumentException("deviceSerial must not be null or empty!");
+        if (cmds == null || cmds.isEmpty())
+            throw new IllegalArgumentException("cmds must not be null or empty!");
+        
+        if (returnOutput)
+            return controller.executeCommand(Command.getCommand(Command.CommandType.FASTBOOT_COMMAND, deviceSerial, cmds, true));
+        else
+            return null;
     }
 
     /**
@@ -87,8 +107,17 @@ public class FastbootController {
      * @return ADB output.
      * @throws IOException if something went wrong.
      */
-    public String rebootDeviceFastboot(String deviceSerial, RebootTo mode) throws IOException {
-        return controller.fastboot_rebootDevice(deviceSerial, mode);
+    public void rebootDeviceFastboot(String deviceSerial, RebootTo mode) throws IOException {
+        switch (mode) {
+            case ANDROID:
+                controller.executeCommand(
+                Command.getCommand(Command.CommandType.FASTBOOT_COMMAND, deviceSerial, 
+                                                                         Command.convertArrayToList("reboot"), false));
+            default:
+                controller.executeCommand(
+                Command.getCommand(Command.CommandType.FASTBOOT_COMMAND, deviceSerial, 
+                                                                         Command.convertArrayToList("reboot-bootloader"), false));
+        }
     }
     
     /**
@@ -97,7 +126,19 @@ public class FastbootController {
      * @throws IOException If something goes wrong.
      */
     public List<String> getConnectedDevices() throws IOException {
-        return controller.getConnectedFastbootDevices();
+        List<String> devices = new ArrayList<>();
+        String rawOutput = null;
+        BufferedReader reader = null;
+        String line;
+        
+        rawOutput = controller.executeCommand(Command.getAnonymousCommand(Command.CommandType.ANONYMOUS_COMMAND, Command.convertArrayToList("devices"), true, false)); 
+        
+        reader = new BufferedReader(new StringReader(rawOutput));
+        while ((line = reader.readLine()) != null)
+            devices.add((line.split("\\s"))[0]);
+        reader.close();
+        
+        return devices;
     }
 
 }

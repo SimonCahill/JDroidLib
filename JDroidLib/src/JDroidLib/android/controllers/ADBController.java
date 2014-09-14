@@ -84,6 +84,8 @@ public final class ADBController {
         else return (instance = new ADBController());
     }
 
-    
+    private ADBController() throws IOException, InterruptedException, OSNotSupportedException {
+        
+    }
 
 }

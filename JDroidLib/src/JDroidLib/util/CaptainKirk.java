@@ -17,21 +17,11 @@
 
 package JDroidLib.util;
 
-import JDroidLib.android.controllers.ADBController;
-import JDroidLib.android.device.Device;
 import JDroidLib.enums.*;
 import JDroidLib.exceptions.*;
-
-import net.lingala.zip4j.exception.ZipException;
+import JDroidLib.interfaces.*;
 
 import java.io.*;
-import java.util.*;
-import java.net.URL;
-import java.nio.channels.Channels;
-import java.nio.channels.ReadableByteChannel;
-import java.net.InetAddress;
-import java.nio.file.CopyOption;
-import java.nio.file.Files;
 
 /**
  * This is Captain Kirk! Say hello! He will be our commander and captain,
@@ -40,14 +30,16 @@ import java.nio.file.Files;
  *
  * @author beatsleigher
  */
-@SuppressWarnings({"MismatchedQueryAndUpdateOfCollection", "UnusedAssignment", "StringConcatenationInsideStringBufferAppend"})
-public class CaptainKirk {
+@SuppressWarnings({"MismatchedQueryAndUpdateOfCollection", "UnusedAssignment", "StringConcatenationInsideStringBufferAppend", "FieldMayBeFinal"})
+public class CaptainKirk implements Disposeable {
 
-    ResourceManager resMan = null;
-    private File adb = null;
-    private File fastboot = null;
-    private final File backupDir;
+    // These values can't be final, because they'll be set to >>null<< by the dispose() method.
+    private ResourceManager resMan;
+    private File adb;
+    private File fastboot;
+    private File backupDir;
     private static CaptainKirk instance = null;
+    private File workingDir = new File(String.format("{0}{1}{2}", System.getProperty("user.home"), System.getProperty("path.seperator"), "ADB-Fastboot-Work"));
     
     /**
      * Singleton statement.
@@ -64,8 +56,62 @@ public class CaptainKirk {
         else 
             return (instance = new CaptainKirk());
     }
+    public static File getADB() { return instance.adb; }
+    public static File getFastboot() { return instance.fastboot; }
 
+    private CaptainKirk() throws IOException, InterruptedException, OSNotSupportedException {
+        resMan = new ResourceManager();
+        String osName = System.getProperty("os.name").split("[\\s]")[0];
+        resMan.install(OS.getOS(osName), "default");
+        adb = resMan.getADB();
+        fastboot = resMan.getFastboot();
+        backupDir = resMan.getBackupDir();
+    }
     
+    //# ========== Processing Methods Start ========== #\\
+    /**
+     * Executes ADB, fastboot and anonymous commands.
+     * This method is used to execute all commands via the ADB server or fastboot server.
+     * @param command The @see Command object containing all the information needed to execute commands.
+     * @return If the property "returnsOutput" in the command object is set to <u>true</u>, 
+     * this function will return the output provided by the command.
+     * @throws IOException If an error occurs while executing the process.
+     */
+    public String executeCommand(Command command) throws IOException {
+        if (command == null) throw new IllegalArgumentException("Command cannot be null!");
+        StringBuilder sBuilder = new StringBuilder();
+        
+        Process pr;
+        ProcessBuilder process = new ProcessBuilder();
+        BufferedReader iStreamReader;
+        String line = null;
+        
+        process.command(command.getParameters());
+        process.directory(workingDir);
+        process.redirectErrorStream(true);
+        pr = process.start();
+        
+        // Process output
+        iStreamReader = new BufferedReader(new InputStreamReader(pr.getInputStream()));
+        while ((line = iStreamReader.readLine()) != null)
+            if (command.returnsOutput()) {
+                sBuilder.append(line);
+                sBuilder.append("\n");
+            }
+        
+        executeCommand(Command.getAnonymousCommand(Command.CommandType.ANONYMOUS_COMMAND, Command.convertArrayToList("kill-server"), false, true));
+        
+        return sBuilder.toString();
+    }
+    //# ========== Processing Methods  End  ========== #\\
+
+    /**
+     * Prepares this object for disposal.
+     */
+    @Override
+    public void dispose() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
 
 }
 
