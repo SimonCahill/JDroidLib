@@ -51,10 +51,7 @@ public class CaptainKirk implements Disposeable {
      * @throws OSNotSupportedException This exception is thrown if JDroidLib detects that the host is running a non-supported operating system.
      */
     public static CaptainKirk getInstance() throws IOException, InterruptedException, OSNotSupportedException {
-        if (instance != null)
-            return instance;
-        else 
-            return (instance = new CaptainKirk());
+        return instance == null ? instance = new CaptainKirk() : instance;
     }
     public static File getADB() { return instance.adb; }
     public static File getFastboot() { return instance.fastboot; }
