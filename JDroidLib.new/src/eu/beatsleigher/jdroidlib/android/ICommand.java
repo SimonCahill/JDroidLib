@@ -18,6 +18,8 @@
  */
 package eu.beatsleigher.jdroidlib.android;
 
+import java.util.concurrent.TimeUnit;
+
 /**
  * Interface ICommand
  * Contains methods and variables required to execute commands on a connected device.
@@ -34,9 +36,10 @@ public interface ICommand {
     /**
      * Sets the timeout for this command.
      * @param timeout The time to pass until command execution is aborted.
+     * @param timeUnit The unit of time for the timeout. (default: seconds)
      * @return A subclass of {@link ICommand} with the new timeout.
      */
-    ICommand withTimeout(int timeout);
+    ICommand withTimeout(int timeout, TimeUnit timeUnit);
     
     /**
      * Gets a ready to use {java.lang.ProcessBuilder} which is used by HAL to execute commands via the ADB server.

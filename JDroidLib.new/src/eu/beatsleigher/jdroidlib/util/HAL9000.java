@@ -18,8 +18,10 @@
  */
 package eu.beatsleigher.jdroidlib.util;
 
+import eu.beatsleigher.jdroidlib.android.Command;
 import eu.beatsleigher.jdroidlib.exception.InstallationFailedException;
 import java.io.*;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Good afternoon, gentlemen. I am a HAL 9000 computer.
@@ -84,6 +86,12 @@ public class HAL9000 {
      * @return A {@link java.io.File} object pointing to JDroidLib's dir on the filesystem.
      */
     public File getJDroidLibPath() { return ResourceManager.Installer.getInstallPath().getParentFile(); }
+    //</editor-fold>
+    //<editor-fold defaultstate="collapsed" desc="Process Execution">
+    public void executeNoReturn(Command command) throws IOException, InterruptedException {
+        Process pr = command.getProcess().start();
+        pr.waitFor(command.getTimeout(), command.getTimeUnits());
+    }
     //</editor-fold>
     //</editor-fold>
     

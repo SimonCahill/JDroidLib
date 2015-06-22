@@ -23,6 +23,7 @@ import eu.beatsleigher.jdroidlib.exception.DeviceHasNoRootException;
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Abstract class command.
@@ -30,14 +31,20 @@ import java.util.List;
  * @author Simon
  */
 public abstract class Command implements ICommand {
-
+    
+    /**
+     * The default timeout for commands.
+     */
+    public static final int DEFAULT_TIMEOUT = -1;
+    
     protected final String command;
     protected final List<String> params;
     protected final Device device;
     protected final boolean isShellCommand;
     protected final boolean isShellRooted;
-    protected int timeout;
+    protected int timeout = DEFAULT_TIMEOUT;
     protected File workingDir;
+    protected TimeUnit timeoutTimeUnit;
     
     /**
      * Constructor Constructs an instance of this class, without a
@@ -97,6 +104,47 @@ public abstract class Command implements ICommand {
         if (command == null || command.isEmpty()) throw new IllegalArgumentException("Command must not be null or empty!"); else this.command = command;
         this.params = Arrays.asList(params);
     }
+    
+    /**
+     * Default (Recommended) Constructor Constructs an instance of this class,
+     * with a {@link eu.beatsleigher.jdroidlib.android.device.Device} attribute.
+     * This constructor constructs an instance of this class which can be used
+     * to specifically target a connected device. Furthermore, this constructor
+     * allows for ADB shell commands to be passed to and executed on the
+     * selected device.
+     *
+     * @param device The device to pass the command to.
+     * @param command The command to execute (cannot be "adb" or "-s"!)
+     * @param params The parameters and/or flags to go with the command to be
+     * executed.
+     * @throws IllegalArgumentException
+     * This constructor will throw an {@link java.lang.IllegalArgumentException} if:
+     * <ul>
+     * <li>
+     * The passed {@link eu.beatsleigher.jdroidlib.android.device.Device} object is null
+     * </li>
+     * <li>
+     * The passes command is null or empty
+     * </li>
+     * </ul>
+     * @throws DeviceHasNoRootException
+     * This constructor will throw a {@link eu.beatsleigher.jdroidlib.exception.DeviceHasNoRootException} if:
+     * <ul>
+     * <li>
+     * The command is designated a rooted shell command and the device has no root access.
+     * </li>
+     * </ul>
+     */
+    Command(Device device, String command, String... params) throws IllegalArgumentException {
+        if (device == null)
+            throw new IllegalArgumentException("Device must not be null! To specify a non device-specific command, please use the NoDevice-method!");
+        this.device = device;
+        this.isShellCommand = false; this.isShellRooted = false;
+        if (command == null || command.isEmpty())
+            throw new IllegalArgumentException("Command must not be null or empty!");
+        this.command = command;
+        this.params = Arrays.asList(params);
+    }
 
     /**
      * {@inheritDoc }
@@ -114,7 +162,7 @@ public abstract class Command implements ICommand {
      * {@inheritDoc }
      */
     @Override
-    public abstract ICommand withTimeout(int timeout);
+    public abstract ICommand withTimeout(int timeout, TimeUnit timeUnit);
 
     /**
      * {@inheritDoc }
@@ -134,5 +182,17 @@ public abstract class Command implements ICommand {
     public ICommand withWorkingDir(File workPath) {
         this.workingDir = workPath; return this;
     }
+    
+    /**
+     * Gets the timeout for this AdbCommand instance.
+     * @return An int-value representing the timeout.
+     */
+    public int getTimeout() { return timeout; }
+    
+    /**
+     * Gets the unit of time for the timeout for this command.
+     * @return 
+     */
+    public TimeUnit getTimeUnits() { return timeoutTimeUnit; }
     
 }

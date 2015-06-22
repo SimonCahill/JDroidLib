@@ -82,6 +82,40 @@ public class AdbCommand extends Command implements ICommand {
     AdbCommand(Device device, boolean isShellCommand, boolean rootShell, String command, String... params) throws IllegalArgumentException, DeviceHasNoRootException {
         super(device, isShellCommand, rootShell, command, params);
     }
+    
+    /**
+     * Default (Recommended) Constructor Constructs an instance of this class,
+     * with a {@link eu.beatsleigher.jdroidlib.android.device.Device} attribute.
+     * This constructor constructs an instance of this class which can be used
+     * to specifically target a connected device. Furthermore, this constructor
+     * allows for ADB shell commands to be passed to and executed on the
+     * selected device.
+     *
+     * @param device The device to pass the command to.
+     * @param command The command to execute (cannot be "adb" or "-s"!)
+     * @param params The parameters and/or flags to go with the command to be
+     * executed.
+     * @throws IllegalArgumentException
+     * This constructor will throw an {@link java.lang.IllegalArgumentException} if:
+     * <ul>
+     * <li>
+     * The passed {@link eu.beatsleigher.jdroidlib.android.device.Device} object is null
+     * </li>
+     * <li>
+     * The passes command is null or empty
+     * </li>
+     * </ul>
+     * @throws DeviceHasNoRootException
+     * This constructor will throw a {@link eu.beatsleigher.jdroidlib.exception.DeviceHasNoRootException} if:
+     * <ul>
+     * <li>
+     * The command is designated a rooted shell command and the device has no root access.
+     * </li>
+     * </ul>
+     */
+    AdbCommand(Device device, String command, String... params) throws IllegalArgumentException {
+        super(device, command, params);
+    }
 
     /**
      * {@inheritDoc}
