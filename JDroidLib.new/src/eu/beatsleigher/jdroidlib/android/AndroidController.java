@@ -19,10 +19,20 @@
 package eu.beatsleigher.jdroidlib.android;
 
 import eu.beatsleigher.jdroidlib.android.device.Device;
+import eu.beatsleigher.jdroidlib.events.CommandExecutionCompletedEvent;
+import eu.beatsleigher.jdroidlib.events.CommandExecutionCompletedEventListener;
+import eu.beatsleigher.jdroidlib.events.CommandOutputChangedEventListener;
 import eu.beatsleigher.jdroidlib.exception.DeviceHasNoRootException;
 import eu.beatsleigher.jdroidlib.exception.InstallationFailedException;
 import eu.beatsleigher.jdroidlib.util.HAL9000;
 import java.io.IOException;
+import java.util.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.FutureTask;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 /**
  * AndroidController
@@ -54,7 +64,8 @@ public class AndroidController {
     
     //<editor-fold defaultstate="collapsed" desc="Variables">
     private HAL9000 _helloGentlemen;
-    private Object _lock = "I'm sorry, Dave. I'm afraid I can't do that. ";
+    private final Object _lock = "I'm sorry, Dave. I'm afraid I can't do that. ";
+    private List<CommandExecutionCompletedEventListener> executionCompleteEventListeners;
     //</editor-fold>
     
     //<editor-fold defaultstate="collapsed" desc="Ctor">
@@ -66,6 +77,7 @@ public class AndroidController {
      */
     private AndroidController() throws IOException, InterruptedException, InstallationFailedException {
         _helloGentlemen = HAL9000.getInstance();
+        this.executionCompleteEventListeners = new ArrayList<>();
     }
     //</editor-fold>
     
@@ -107,8 +119,94 @@ public class AndroidController {
     }
     //</editor-fold>
     //<editor-fold defaultstate="collapsed" desc="Command Execution">
+    /**
+     * Executes a given {@link eu.beatsleigher.jdroidlib.android.AdbCommand} without returning anything.
+     * @param command The {@link eu.beatsleigher.jdroidlib.android.AdbCommand} to execute.
+     * @throws IOException This exception is thrown if an IO error occurs and process execution cannot continue.
+     * @throws InterruptedException This exception is thrown if an error occurs while waiting for the command to exit.
+     */
+    public void executeAdbCommandNoReturn(AdbCommand command) throws IOException, InterruptedException {
+        synchronized (_lock) {
+            _helloGentlemen.executeNoReturn(command);
+        }
+    }
     
+    /**
+     * Executes a given {@link eu.beatsleigher.jdroidlib.android.AdbCommand} and returns the exit value.
+     * @param command The {@link eu.beatsleigher.jdroidlib.android.AdbCommand} to execute.
+     * @return The exit value of the command {@code int}
+     * @throws IOException This exception is thrown if an IO error occurs and process execution cannot continue.
+     * @throws InterruptedException This exception is thrown if an error occurs while waiting for the command to exit.
+     */
+    public int executeAdbCommandReturnExitValue(AdbCommand command) throws IOException, InterruptedException {
+        synchronized (_lock) { return _helloGentlemen.executeReturnExitValue(command); }
+    }
+    
+    /**
+     * Executes a given {@link eu.beatsleigher.jdroidlib.android.AdbCommand} and returns its output.
+     * @param command The {@link eu.beatsleigher.jdroidlib.android.AdbCommand} to execute.
+     * @return The output of the command.
+     * @throws IOException This exception is thrown if an IO error occurs and process execution cannot continue.
+     * @throws InterruptedException This exception is thrown if an error occurs while waiting for the command to exit.
+     */
+    public String executeAdbCommandReturnOutput(AdbCommand command) throws IOException, InterruptedException {
+        synchronized (_lock) { return _helloGentlemen.executeReturnOutput(command); }
+    }
+    
+    /**
+     * Executes an {@link eu.beatsleigher.jdroidlib.android.AdbCommand} asynchronously.
+     * @param command
+     * @throws IOException
+     * @throws InterruptedException 
+     */
+    public void executeAdbCommandNoReturnAsync(AdbCommand command) throws IOException, InterruptedException {
+        Future future = new FutureTask(() -> {
+            synchronized (_lock) { executeAdbCommandNoReturn(command); }
+            if (!executionCompleteEventListeners.isEmpty())
+                executionCompleteEventListeners.stream().forEach((evt) -> {
+                    evt.onCommandExecutionCompleted(new CommandExecutionCompletedEvent(this, command, null, -1));
+            });
+            return null;
+        });
+    };
     //</editor-fold>
+    //</editor-fold>
+    //<editor-fold defaultstate="collapsed" desc="Event Stuff">
+    /**
+     * Adds a new event listener to this class.
+     * @param evt The {@link CommandExectionCompletedEventListener} to add to this class.
+     * @return A value indicating whether the addition was successful or not.
+     */
+    public boolean addCommandExecutionCompleteEventListener(CommandExecutionCompletedEventListener evt) {
+        return executionCompleteEventListeners.add(evt);
+    }
+    
+    /**
+     * Adds a new event listener to this class.
+     * @param evt The {@link CommandOutputChangedEventListener} to add to this class.
+     * @return A value indicating whether the addition was successful or not.
+     */
+    public boolean addCommandOutputChangedEventListener(CommandOutputChangedEventListener evt) {
+        return _helloGentlemen.addCommandOutputChangedEventListener(evt);
+    }
+    
+    /**
+     * Removes an event listener from this class.
+     * @param evt The {@link eu.beatsleigher.jdroidlib.events.CommandExecutionCompletedEvent} to remove from this class.
+     * @return A value indicating whether removal was successful or not.
+     */
+    public boolean removeCommandExecutionCompleteEventListener(CommandExecutionCompletedEventListener evt) {
+        return executionCompleteEventListeners.remove(evt);
+    }
+    
+    /**
+     * Removes an event listener from this class.
+     * @param evt The {@link eu.beatsleigher.jdroidlib.events.CommandOuputChangedEvent} to remove from this class.
+     * @return A value indicating whether the removal was successful or not.
+     */
+    public boolean removeCommandOutputChangedEventListener(CommandOutputChangedEventListener evt) {
+        return _helloGentlemen.removeCommandOutputChangedEventListener(evt);
+    }
     //</editor-fold>
     //</editor-fold>
     

@@ -19,9 +19,10 @@
 package eu.beatsleigher.jdroidlib.util;
 
 import eu.beatsleigher.jdroidlib.android.Command;
+import eu.beatsleigher.jdroidlib.events.*;
 import eu.beatsleigher.jdroidlib.exception.InstallationFailedException;
 import java.io.*;
-import java.util.concurrent.TimeUnit;
+import java.util.*;
 
 /**
  * Good afternoon, gentlemen. I am a HAL 9000 computer.
@@ -47,7 +48,7 @@ public class HAL9000 {
     
     //<editor-fold defaultstate="collapsed" desc="Instance Members">
     //<editor-fold defaultstate="collapsed" desc="Variables">
-    
+    List<CommandOutputChangedEventListener> commandOutputChangedEventHandlers = new ArrayList<>();
     //</editor-fold>
     //<editor-fold defaultstate="collapsed" desc="Ctor" >
     /**
@@ -88,9 +89,75 @@ public class HAL9000 {
     public File getJDroidLibPath() { return ResourceManager.Installer.getInstallPath().getParentFile(); }
     //</editor-fold>
     //<editor-fold defaultstate="collapsed" desc="Process Execution">
+    /**
+     * Executes a passed command without returning anything.
+     * This method runs synchronously and the calling method locks it to a thread.
+     * @param command The command to execute.
+     * @throws IOException This exception is thrown if an IO error occurs and process execution cannot continue.
+     * @throws InterruptedException This exception is thrown if an error occurs while waiting for the command to exit.
+     */
     public void executeNoReturn(Command command) throws IOException, InterruptedException {
         Process pr = command.getProcess().start();
         pr.waitFor(command.getTimeout(), command.getTimeUnits());
+    }
+    
+    /**
+     * Executed a passed command and returns the exit value of the process.
+     * @param command The command to execute.
+     * @return The return value of the executed command.
+     * @throws IOException This exception is thrown if an IO error occurs and process execution cannot continue.
+     * @throws InterruptedException This exception is thrown if an error occurs while waiting for the command to exit.
+     */
+    public int executeReturnExitValue(Command command) throws IOException, InterruptedException {
+        Process pr = command.getProcess().start();
+        pr.waitFor(command.getTimeout(), command.getTimeUnits());
+        return pr.exitValue();
+    }
+    
+    /**
+     * Executes a passed command and returns the output of the process.
+     * @param command The command to execute.
+     * @return The output of the executed process.
+     * @throws IOException This exception is thrown if an IO error occurs and process execution cannot continue.
+     * @throws InterruptedException This exception is thrown if an error occurs while waiting for the command to exit.
+     */
+    public String executeReturnOutput(Command command) throws IOException, InterruptedException {
+        StringBuilder sBuilder = new StringBuilder();
+        Process pr = command.getProcess().start();
+        BufferedReader inStreamReader = new BufferedReader(new InputStreamReader(pr.getInputStream()));
+        String inLine;
+        
+        while (inStreamReader.read() != -1) {
+            inLine = inStreamReader.readLine();
+            if (inLine.isEmpty()) continue;
+            
+            sBuilder.append(inLine);
+            if (!commandOutputChangedEventHandlers.isEmpty())
+                for (CommandOutputChangedEventListener handler : commandOutputChangedEventHandlers)
+                    handler.onCommandOutputChangedEventListener(
+                            new eu.beatsleigher.jdroidlib.events.CommandOuputChangedEvent(this, command, inLine, sBuilder.toString())); // Don't change! It works!
+        }
+        
+        return sBuilder.toString();
+    }
+    //</editor-fold>
+    //<editor-fold defaultstate="collapsed" desc="Event Lists">
+    /**
+     * Adds a new {@link eu.beatsleigher.jdroidlib.events.CommandOuputChangedEventListener} to the list of listeners in this class.
+     * @param listener The listener to add.
+     * @return A value indicating whether the addition was successful or not.
+     */
+    public boolean addCommandOutputChangedEventListener(CommandOutputChangedEventListener listener) {
+        return commandOutputChangedEventHandlers.add(listener);
+    }
+    
+    /**
+     * Removes a {@link eu.beatsleigher.jdroidlib.events.CommandOutputChangedEventListener} from the list of listeners in this class.
+     * @param listener The listener to remove.
+     * @return A value indicating whether removal was successful or not.
+     */
+    public boolean removeCommandOutputChangedEventListener(CommandOutputChangedEventListener listener) {
+        return commandOutputChangedEventHandlers.remove(listener);
     }
     //</editor-fold>
     //</editor-fold>

@@ -21,13 +21,14 @@ package eu.beatsleigher.jdroidlib.android;
 import eu.beatsleigher.jdroidlib.android.device.Device;
 import eu.beatsleigher.jdroidlib.exception.DeviceHasNoRootException;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 /**
  * AdbCommand Represents a command sent to the ADB executable. This command
  * cannot be instantiated by means of a constructor and must be gotten by the
- * {@link eu.beatsleigher.jdroidlib.android.AndroidController.getAdbCommand} or
+ * {@link eu.beatsleigher.jdroidlib.android.AndroidController}.getAdbCommand or
  * the
- * {@link eu.beatsleigher.jdroidlib.android.AndroidController.getAdbShellCommand}
+ * {@link eu.beatsleigher.jdroidlib.android.AndroidController}.getAdbShellCommand
  * methods.
  *
  * @author Simon
@@ -121,8 +122,8 @@ public class AdbCommand extends Command implements ICommand {
      * {@inheritDoc}
      */
     @Override
-    public ICommand withTimeout(int timeout) {
-        this.timeout = timeout; return this;
+    public ICommand withTimeout(int timeout, TimeUnit timeUnit) {
+        this.timeout = timeout; this.timeoutTimeUnit = timeUnit; return this;
     }
 
     /**
