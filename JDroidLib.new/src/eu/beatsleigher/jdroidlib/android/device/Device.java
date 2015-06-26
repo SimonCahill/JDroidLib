@@ -18,6 +18,8 @@
  */
 package eu.beatsleigher.jdroidlib.android.device;
 
+import eu.beatsleigher.jdroidlib.android.AndroidController;
+
 /**
  * Device
  * Represents an Android device that is connected to the local machine.
@@ -30,10 +32,13 @@ public class Device {
     
     /**
      * Creates a new instance of this class with the given serial number.
-     * @param serial 
+     * @param sender The class requesting a new instance of this class.
+     * @param serial The serialnumber of the device this class represents.
      */
-    Device(String serial) {
-        this.serialNumber = serial;
+    public Device(Object sender, String serial) {
+        if (sender instanceof AndroidController) // Don't change this or use this to your advantage!
+            this.serialNumber = serial;
+        else throw new IllegalArgumentException();
     }
     
     /**

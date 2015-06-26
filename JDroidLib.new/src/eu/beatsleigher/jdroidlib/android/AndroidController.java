@@ -25,14 +25,11 @@ import eu.beatsleigher.jdroidlib.events.CommandOutputChangedEventListener;
 import eu.beatsleigher.jdroidlib.exception.DeviceHasNoRootException;
 import eu.beatsleigher.jdroidlib.exception.InstallationFailedException;
 import eu.beatsleigher.jdroidlib.util.HAL9000;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.StringReader;
 import java.util.*;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.concurrent.FutureTask;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
+import java.util.concurrent.*;
 
 /**
  * AndroidController
@@ -66,6 +63,8 @@ public class AndroidController {
     private HAL9000 _helloGentlemen;
     private final Object _lock = "I'm sorry, Dave. I'm afraid I can't do that. ";
     private List<CommandExecutionCompletedEventListener> executionCompleteEventListeners;
+    private List<String> connectedDeviceSerials;
+    private List<Device> connectedDevices;
     //</editor-fold>
     
     //<editor-fold defaultstate="collapsed" desc="Ctor">
@@ -156,8 +155,8 @@ public class AndroidController {
     /**
      * Executes an {@link eu.beatsleigher.jdroidlib.android.AdbCommand} asynchronously.
      * @param command
-     * @throws IOException
-     * @throws InterruptedException 
+     * @throws IOException This exception is thrown if an IO error occurs and process execution cannot continue.
+     * @throws InterruptedException This exception is thrown if an error occurs while waiting for the command to exit.
      */
     public void executeAdbCommandNoReturnAsync(AdbCommand command) throws IOException, InterruptedException {
         Future future = new FutureTask(() -> {
@@ -169,8 +168,51 @@ public class AndroidController {
             return null;
         });
     };
+    
+    /**
+     * Executes an {@link eu.beatsleigher.jdroidlib.android.AdbCommand} asynchronously.
+     * @param command The command to execute.
+     * @return Returns the exit value of the process.
+     * @throws IOException This exception is thrown if an IO error occurs and process execution cannot continue.
+     * @throws InterruptedException This exception is thrown if an error occurs while waiting for the command to exit.
+     */
+    public Future<Integer> executeAdbCommandReturnExitValueAsync(AdbCommand command) throws IOException, InterruptedException  {
+        return new FutureTask<>(() -> {
+            final int exitValue;
+            synchronized (_lock) { exitValue = executeAdbCommandReturnExitValue(command); }
+            
+            if (!executionCompleteEventListeners.isEmpty())
+                executionCompleteEventListeners.stream().forEach((evt) -> {
+                    evt.onCommandExecutionCompleted(new CommandExecutionCompletedEvent(this, command, null, exitValue));
+            });
+            
+            return exitValue;
+        });
+    }
+    
+    /**
+     * Executes an {@link eu.beatsleigher.jdroidlib.android.AdbCommand} asynchronously.
+     * @param command The command to execute.
+     * @return The entire output of the process.
+     * @throws IOException This exception is thrown if an IO error occurs and process execution cannot continue.
+     * @throws InterruptedException This exception is thrown if an error occurs while waiting for the command to exit.
+     */
+    public Future<String> executeAdbCommandReturnOutputAsync(AdbCommand command) throws IOException, InterruptedException {
+        return new FutureTask<>(() -> {
+            final String cmdOutput;
+            synchronized (_lock) { cmdOutput = executeAdbCommandReturnOutput(command); }
+            
+            if (!executionCompleteEventListeners.isEmpty())
+                executionCompleteEventListeners.stream().forEach((evt) -> {
+                    evt.onCommandExecutionCompleted(new CommandExecutionCompletedEvent(this, command, cmdOutput, -1));
+            });
+            
+            return cmdOutput;
+        });
+    }
     //</editor-fold>
     //</editor-fold>
+    
     //<editor-fold defaultstate="collapsed" desc="Event Stuff">
     /**
      * Adds a new event listener to this class.
@@ -208,6 +250,75 @@ public class AndroidController {
         return _helloGentlemen.removeCommandOutputChangedEventListener(evt);
     }
     //</editor-fold>
+    
+    //<editor-fold defaultstate="collapsed" desc="Device Management">
+    /**
+     * Starts the ADB server.
+     * @throws IOException
+     * @throws InterruptedException 
+     */
+    public void startServer() throws IOException, InterruptedException {
+        executeAdbCommandNoReturn(formAdbCommandNoDevice("start-server"));
+    }
+    
+    /**
+     * Stops the ADB server
+     * @throws IOException
+     * @throws InterruptedException 
+     */
+    public void stopServer() throws IOException, InterruptedException {
+        executeAdbCommandNoReturn(formAdbCommandNoDevice("stop-server"));
+    }
+    
+    /**
+     * Updates the device lists in this class.
+     * @throws IOException This exception is thrown if an IO error occurs and command execution can no longer continue;
+     * @throws InterruptedException 
+     */
+    public void updateDeviceLists() throws IOException, InterruptedException {
+        List<Device> _deviceObjects = new ArrayList<>();
+        List<String> _deviceSerials = new ArrayList<>();
+        String _rawOutput = "", _line = null, _parsedDevice = null;
+        BufferedReader reader;
+        
+        _rawOutput = executeAdbCommandReturnOutput(formAdbCommandNoDevice("devices"));
+        
+        reader = new BufferedReader(new StringReader(_rawOutput));
+        while (reader.read() != -1) {
+            _line = reader.readLine();
+            if (_line.toLowerCase().contains("list") || _line.isEmpty()) continue;
+            
+            _parsedDevice = _line.split("\\s")[0];
+            _deviceObjects.add(getDevice(_parsedDevice));
+            _deviceSerials.add(_parsedDevice);
+        }
+        
+    }
+    //</editor-fold>
+    /**
+     * Gets a device object from the passed serial number.
+     * @param serial The serial number of the device.
+     * @return A {@link eu.beatsleigher.jdroidlib.android.device.Device} object representing a device connected to the computer.
+     */
+    public Device getDevice(String serial) {
+        return new Device(this, serial);
+    }
+    
+    /**
+     * Gets a {@link java.util.List} (of {@link eu.beatsleigher.jdroidlib.android.device.Device}) containing objects representing all the devices connected to this computer.
+     * @return A list of all connected devices.
+     * @throws java.io.IOException
+     * @throws java.lang.InterruptedException
+     */
+    public List<Device> getConnectedDevices() throws IOException, InterruptedException { updateDeviceLists(); return connectedDevices; }
+    
+    /**
+     * Gets a {@link java.util.List} (of {@link java.lang.String}) containing all the serial numbers of the connected devices.
+     * @return A list of the serial numbers of all the devices connected to this computer.
+     * @throws java.io.IOException
+     * @throws java.lang.InterruptedException
+     */
+    public List<String> getDeviceSerials() throws IOException, InterruptedException { updateDeviceLists(); return connectedDeviceSerials; }
     //</editor-fold>
     
 }
