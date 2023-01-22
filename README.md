@@ -1,8 +1,9 @@
-JDroidLib
-=========
+# JDroidLib
 
-JDroidLib is a Java class library, based off of regaw_leinad's AndroidLib, written in C#. 
-JDroidLib attempts to provide the same functionality, though it's designed for use in Java, 
-thus making it available for virtually any OS
+This repository contains the source code to JDroidLib, a Java library for communication with Android devices via ADB/fastboot.
 
-JDroidLib has also been featured by many sites, including the infamous XDA-Devlopers portal!
+# License
+As of 2023-01-22 this repository is licensed under the "Do Whatever the Fuck you Want With it" license.
+If this library has helped you in any way, shape or form, please feel free to mention the library or me. I'd appreciate it.
+
+In that sense: Go ahead.
