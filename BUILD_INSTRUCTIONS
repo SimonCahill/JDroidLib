@@ -1,0 +1,7 @@
+Instructions for building JDroidLib:
+
+1) Pull a copy of the source code
+2) Add Zip4J as a reference to the source code!
+3) Click on the Build key (using NetBeans or Eclipse)
+4) You're done! The built jar should be located in the dist/ folder.
+
